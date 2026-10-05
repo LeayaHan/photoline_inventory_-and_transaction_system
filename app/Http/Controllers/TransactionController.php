@@ -41,7 +41,7 @@ class TransactionController extends Controller
             ->withQueryString();
 
         return view(
-            'transactions.index',
+            'staff.transactions.index',
             compact('transactions')
         );
     }
@@ -51,7 +51,7 @@ class TransactionController extends Controller
      */
     public function create()
     {
-        return view('transactions.create');
+        return view('staff.transactions.create');
     }
 
     /**
@@ -123,7 +123,7 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
         return view(
-            'transactions.show',
+            'staff.transactions.show',
             compact('transaction')
         );
     }
@@ -134,7 +134,7 @@ class TransactionController extends Controller
     public function edit(Transaction $transaction)
     {
         return view(
-            'transactions.edit',
+            'staff.transactions.edit',
             compact('transaction')
         );
     }

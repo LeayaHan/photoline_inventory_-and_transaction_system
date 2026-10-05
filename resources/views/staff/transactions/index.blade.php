@@ -1,50 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.panel')
 
-<head>
-    <meta charset="UTF-8">
+@section('title', 'Transactions')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Transactions</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-        }
-
-        nav {
-            background: #222;
-            padding: 15px 30px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 20px;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-        }
-
+@push('styles')
+<style>
         .top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-
         .button,
         button {
             padding: 9px 14px;
@@ -55,64 +20,48 @@
             text-decoration: none;
             cursor: pointer;
         }
-
         .search {
             margin-bottom: 25px;
         }
-
         .search input {
             width: 300px;
             padding: 9px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
         }
-
         th,
         td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
-
         th {
             background: #eee;
         }
-
         .actions a {
             margin-right: 10px;
         }
-
         .void-form {
             display: inline;
         }
-
         .success {
             background: #e2f5e9;
             border: 1px solid #9bd3ac;
             padding: 12px;
             margin-bottom: 20px;
         }
-
         .pagination {
             margin-top: 20px;
         }
-    </style>
-</head>
+    
+</style>
+@endpush
 
-<body>
-
-<nav>
-    <a href="{{ route('dashboard') }}">Dashboard</a>
-    <a href="{{ route('transactions.index') }}">Transactions</a>
-    <a href="{{ route('audits.index') }}">Audits</a>
-    <a href="{{ route('reports.index') }}">Reports</a>
-</nav>
-
+@section('content')
 <div class="container">
 
     <div class="top">
@@ -256,6 +205,4 @@
     </div>
 
 </div>
-
-</body>
-</html>
+@endsection

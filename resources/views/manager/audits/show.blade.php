@@ -1,93 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.panel')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Inventory Audit')
 
-    <title>Audit #{{ $audit->id }} - Manager</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6f8;
-            color: #1f2937;
-        }
-
-        .navbar {
-            background: #111827;
-            color: white;
-            padding: 18px 30px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar h2 {
-            margin: 0;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .user-area span {
-            font-size: 14px;
-        }
-
-        .logout-button {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 9px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .container {
-            width: 92%;
-            max-width: 1200px;
-            margin: 35px auto;
-        }
-
+@push('styles')
+<style>
         .page-header {
             margin-bottom: 25px;
         }
-
         .page-header h1 {
             margin: 0 0 8px;
             font-size: 30px;
         }
-
         .page-header p {
             margin: 0;
             color: #6b7280;
         }
-
         .card {
             background: white;
             border-radius: 10px;
@@ -95,25 +22,21 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
             margin-bottom: 25px;
         }
-
         .card h2 {
             margin-top: 0;
             margin-bottom: 20px;
         }
-
         .info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
-
         .info-box {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 16px;
         }
-
         .info-label {
             display: block;
             color: #6b7280;
@@ -122,12 +45,10 @@
             text-transform: uppercase;
             font-weight: bold;
         }
-
         .info-value {
             font-size: 16px;
             font-weight: bold;
         }
-
         .status {
             display: inline-block;
             padding: 5px 10px;
@@ -135,26 +56,21 @@
             font-size: 12px;
             font-weight: bold;
         }
-
         .status-completed {
             background: #dcfce7;
             color: #166534;
         }
-
         .status-ongoing {
             background: #fef3c7;
             color: #92400e;
         }
-
         .table-wrapper {
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
         }
-
         th {
             background: #f3f4f6;
             text-align: left;
@@ -162,34 +78,28 @@
             border-bottom: 1px solid #d1d5db;
             font-size: 13px;
         }
-
         td {
             padding: 13px;
             border-bottom: 1px solid #e5e7eb;
             font-size: 14px;
         }
-
         .difference-none {
             color: #059669;
             font-weight: bold;
         }
-
         .difference-shortage {
             color: #dc2626;
             font-weight: bold;
         }
-
         .difference-excess {
             color: #d97706;
             font-weight: bold;
         }
-
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
-
         .summary-box {
             border-radius: 8px;
             padding: 20px;
@@ -197,31 +107,25 @@
             background: #f9fafb;
             border: 1px solid #e5e7eb;
         }
-
         .summary-number {
             display: block;
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 6px;
         }
-
         .summary-label {
             color: #6b7280;
             font-size: 13px;
         }
-
         .summary-shortage .summary-number {
             color: #dc2626;
         }
-
         .summary-excess .summary-number {
             color: #d97706;
         }
-
         .summary-none .summary-number {
             color: #059669;
         }
-
         .button {
             display: inline-block;
             padding: 10px 16px;
@@ -229,79 +133,25 @@
             text-decoration: none;
             font-size: 14px;
         }
-
         .button-gray {
             background: #374151;
             color: white;
         }
-
         .button-gray:hover {
             background: #1f2937;
         }
-
         .back-area {
             margin-top: 25px;
         }
-
-        @media (max-width: 800px) {
-
-            .navbar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .nav-links {
-                flex-wrap: wrap;
-            }
-
-            .user-area {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .info-grid,
+        @media (max-width: 800px) {.info-grid,
             .summary-grid {
                 grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
+            }}
+    
+</style>
+@endpush
 
-<body>
-
-<div class="navbar">
-
-    <h2>Photoline Abreeza</h2>
-
-    <div class="nav-links">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
-        <a href="{{ route('manager.transactions.index') }}">Transactions</a>
-        <a href="{{ route('manager.audits.index') }}">Inventory Audits</a>
-        <a href="{{ route('reports.index') }}">Reports</a>
-    </div>
-
-    <div class="user-area">
-
-        <span>
-            {{ auth()->user()->name }} — Branch Manager
-        </span>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button
-                type="submit"
-                class="logout-button"
-            >
-                Logout
-            </button>
-        </form>
-
-    </div>
-
-</div>
-
+@section('content')
 <div class="container">
 
     <div class="page-header">
@@ -588,6 +438,4 @@
     </div>
 
 </div>
-
-</body>
-</html>
+@endsection

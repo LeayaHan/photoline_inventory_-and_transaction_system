@@ -30,14 +30,14 @@ class InventoryAuditController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('audits.index', compact('audits'));
+        return view('staff.audits.index', compact('audits'));
     }
 
     public function create()
     {
         $products = Product::orderBy('product_name')->get();
 
-        return view('audits.create', compact('products'));
+        return view('staff.audits.create', compact('products'));
     }
 
     public function store(Request $request)
@@ -50,7 +50,7 @@ class InventoryAuditController extends Controller
             'products.*.counted_qty' => ['required', 'integer', 'min:0'],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $audit = DB::transaction(function () use ($validated) {
             $audit = InventoryAudit::create([
                 'user_id' => auth()->id(),
                 'audit_date' => $validated['audit_date'],
@@ -66,9 +66,9 @@ class InventoryAuditController extends Controller
                     'discrepancy' => $product['counted_qty'] - $product['recorded_qty'],
                 ]);
             }
-        });
 
-        $audit = InventoryAudit::latest()->first();
+            return $audit;
+        });
 
         return redirect()
             ->route('audits.show', $audit)
@@ -79,18 +79,30 @@ class InventoryAuditController extends Controller
     {
         $audit->load(['user', 'details.product']);
 
-        return view('audits.show', compact('audit'));
+        return view('staff.audits.show', compact('audit'));
     }
 
     public function edit(InventoryAudit $audit)
     {
+        if ($audit->status === 'Completed') {
+            return redirect()
+                ->route('audits.show', $audit)
+                ->with('error', 'Completed audits can no longer be edited.');
+        }
+
         $audit->load('details.product');
 
-        return view('audits.edit', compact('audit'));
+        return view('staff.audits.edit', compact('audit'));
     }
 
     public function update(Request $request, InventoryAudit $audit)
     {
+        if ($audit->status === 'Completed') {
+            return redirect()
+                ->route('audits.show', $audit)
+                ->with('error', 'Completed audits can no longer be edited.');
+        }
+
         $validated = $request->validate([
             'audit_date' => ['required', 'date'],
             'products' => ['required', 'array', 'min:1'],

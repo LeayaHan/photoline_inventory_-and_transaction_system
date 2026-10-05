@@ -1,82 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.panel')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Inventory Audits')
 
-    <title>Inventory Audit Records - Photoline Abreeza</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6f8;
-            color: #1f2937;
-        }
-
-        .navbar {
-            background: #111827;
-            color: white;
-            padding: 18px 30px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar h2 {
-            margin: 0;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .user-area span {
-            font-size: 14px;
-        }
-
-        .logout-button {
-            background: #dc2626;
-            color: white;
-            border: none;
-
-            padding: 9px 14px;
-            border-radius: 6px;
-
-            cursor: pointer;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1200px;
-
-            margin: 35px auto;
-        }
-
+@push('styles')
+<style>
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -84,16 +11,13 @@
 
             margin-bottom: 25px;
         }
-
         .page-header h1 {
             margin: 0 0 8px;
         }
-
         .page-header p {
             margin: 0;
             color: #6b7280;
         }
-
         .back-button {
             display: inline-block;
 
@@ -105,7 +29,6 @@
             text-decoration: none;
             border-radius: 6px;
         }
-
         .search-box {
             background: white;
             padding: 20px;
@@ -116,12 +39,10 @@
 
             margin-bottom: 25px;
         }
-
         .search-box form {
             display: flex;
             gap: 10px;
         }
-
         .search-box input {
             flex: 1;
 
@@ -132,7 +53,6 @@
 
             font-size: 14px;
         }
-
         .search-button {
             padding: 11px 18px;
 
@@ -144,7 +64,6 @@
 
             cursor: pointer;
         }
-
         .clear-button {
             display: inline-block;
 
@@ -157,7 +76,6 @@
 
             border-radius: 6px;
         }
-
         .table-card {
             background: white;
 
@@ -167,12 +85,10 @@
 
             overflow: hidden;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
         }
-
         th,
         td {
             padding: 14px 16px;
@@ -183,16 +99,13 @@
 
             font-size: 14px;
         }
-
         th {
             background: #f9fafb;
             font-weight: bold;
         }
-
         tr:last-child td {
             border-bottom: none;
         }
-
         .status {
             display: inline-block;
 
@@ -203,17 +116,14 @@
             font-size: 12px;
             font-weight: bold;
         }
-
         .status.ongoing {
             background: #fef3c7;
             color: #92400e;
         }
-
         .status.completed {
             background: #d1fae5;
             color: #065f46;
         }
-
         .view-button {
             display: inline-block;
 
@@ -228,7 +138,6 @@
 
             font-size: 13px;
         }
-
         .empty {
             padding: 40px;
 
@@ -236,94 +145,29 @@
 
             color: #6b7280;
         }
-
         .pagination {
             padding: 20px;
         }
-
-        @media (max-width: 900px) {
-
-            .navbar {
+        @media (max-width: 900px) {.page-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
-
-            .nav-links {
-                flex-wrap: wrap;
-            }
-
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
             .table-card {
                 overflow-x: auto;
             }
-
             table {
                 min-width: 850px;
-            }
-        }
-
-        @media (max-width: 600px) {
-
-            .search-box form {
+            }}
+        @media (max-width: 600px) {.search-box form {
                 flex-direction: column;
-            }
+            }}
+    
+</style>
+@endpush
 
-            .container {
-                width: 94%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="navbar">
-
-        <h2>
-            Photoline Abreeza
-        </h2>
-
-        <div class="nav-links">
-
-            <a href="{{ route('dashboard') }}">
-                Dashboard
-            </a>
-
-            <a href="{{ route('manager.audits.index') }}">
-                Inventory Audits
-            </a>
-
-            <a href="{{ route('reports.index') }}">
-                Reports
-            </a>
-
-        </div>
-
-        <div class="user-area">
-
-            <span>
-                {{ auth()->user()->name }} — Branch Manager
-            </span>
-
-            <form method="POST" action="{{ route('logout') }}">
-
-                @csrf
-
-                <button type="submit" class="logout-button">
-                    Logout
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
+@section('content')
+    
 
 
     <div class="container">
@@ -517,7 +361,4 @@
         </div>
 
     </div>
-
-</body>
-
-</html>
+@endsection

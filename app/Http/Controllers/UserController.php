@@ -22,7 +22,7 @@ class UserController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('users.index', compact('users'));
+        return view('manager.users.index', compact('users'));
     }
 
     public function create()
@@ -35,7 +35,7 @@ class UserController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        return view('users.create');
+        return view('manager.users.create');
     }
 
     public function store(Request $request)
@@ -80,7 +80,7 @@ class UserController extends Controller
             abort(403, 'Only staff accounts can be managed here.');
         }
 
-        return view('users.edit', compact('user'));
+        return view('manager.users.edit', compact('user'));
     }
 
     public function update(Request $request, User $user)
