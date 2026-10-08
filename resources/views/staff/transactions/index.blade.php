@@ -26,18 +26,24 @@
 
     .page-heading h1 {
         margin: 5px 0 0;
+        color: #0b2d5c;
         font-size: 29px;
         letter-spacing: -.7px;
     }
 
+    .page-heading p {
+        margin: 7px 0 0;
+        color: #68738a;
+        font-size: 13px;
+    }
+
     .primary-action,
-    .secondary-action,
-    .danger-action {
+    .secondary-action {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         min-height: 40px;
-        padding: 0 14px;
+        padding: 0 15px;
         border: 0;
         border-radius: 8px;
         text-decoration: none;
@@ -46,20 +52,8 @@
         cursor: pointer;
     }
 
-    .primary-action {
-        color: #fff;
-        background: #1769e8;
-    }
-
-    .secondary-action {
-        color: #536078;
-        background: #eef3f9;
-    }
-
-    .danger-action {
-        color: #c12721;
-        background: #fff0ef;
-    }
+    .primary-action { color: #fff; background: #1769e8; }
+    .secondary-action { color: #536078; background: #eef3f9; }
 
     .notice {
         padding: 12px 14px;
@@ -68,20 +62,12 @@
         font-size: 12px;
     }
 
-    .notice.success {
-        color: #206c43;
-        background: #ebf8f0;
-        border: 1px solid #ccebd9;
-    }
-
-    .notice.error {
-        color: #a72520;
-        background: #fff0ef;
-        border: 1px solid #f5cecb;
-    }
+    .notice.success { color: #206c43; background: #ebf8f0; border: 1px solid #ccebd9; }
+    .notice.error { color: #a72520; background: #fff0ef; border: 1px solid #f5cecb; }
 
     .toolbar {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 150px auto auto;
         align-items: center;
         gap: 9px;
         margin-bottom: 14px;
@@ -91,17 +77,22 @@
         background: #fff;
     }
 
-    .search-input {
-        flex: 1;
+    .search-input,
+    .status-select {
+        width: 100%;
         min-height: 40px;
+        box-sizing: border-box;
         padding: 0 12px;
         border: 1px solid #dbe2ed;
         border-radius: 8px;
         outline: none;
+        color: #172b4d;
+        background: #fff;
         font-size: 12px;
     }
 
-    .search-input:focus {
+    .search-input:focus,
+    .status-select:focus {
         border-color: #1769e8;
         box-shadow: 0 0 0 3px rgba(23,105,232,.09);
     }
@@ -116,6 +107,7 @@
     .data-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
     }
 
     .data-table th,
@@ -123,6 +115,7 @@
         padding: 14px 16px;
         border-bottom: 1px solid #edf0f5;
         text-align: left;
+        vertical-align: middle;
         font-size: 12px;
     }
 
@@ -134,58 +127,93 @@
         text-transform: uppercase;
     }
 
-    .data-table tr:last-child td {
-        border-bottom: 0;
+    .data-table tr:last-child td { border-bottom: 0; }
+    .data-table th:nth-child(1) { width: 17%; }
+    .data-table th:nth-child(2) { width: 17%; }
+    .data-table th:nth-child(3) { width: 17%; }
+    .data-table th:nth-child(4) { width: 13%; }
+    .data-table th:nth-child(5) { width: 11%; }
+    .data-table th:nth-child(6) { width: 25%; }
+
+    .data-table td:not(:last-child) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .control-number {
         color: #1769e8;
         font-weight: 800;
+        letter-spacing: .1px;
     }
 
     .status {
         display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
         padding: 5px 9px;
         border-radius: 999px;
         font-size: 10px;
-        font-weight: 700;
+        font-weight: 800;
     }
 
     .status.pending { color: #1769e8; background: #eaf2ff; }
     .status.claimed { color: #20754a; background: #eaf8f0; }
     .status.voided { color: #b52a25; background: #fff0ef; }
 
-    .row-actions {
+    .action-group {
         display: flex;
         align-items: center;
-        gap: 7px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .action-group form { margin: 0; }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+        height: 32px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
         white-space: nowrap;
     }
 
-    .row-actions a {
-        color: #1769e8;
-        text-decoration: none;
-        font-size: 11px;
-        font-weight: 700;
+    .action-view { color: #1769e8; background: #f3f7fd; border-color: #dbe7f8; }
+    .action-edit { color: #1769e8; background: #fff; border-color: #bcd3f7; }
+    .action-claim { color: #20754a; background: #ebf8f0; border-color: #ccebd9; }
+    .action-void { color: #b52a25; background: #fff0ef; border-color: #f3cfcc; }
+    .action-locked { color: #8792a4; background: #f5f7fa; border-color: #e4e8ee; cursor: default; }
+
+    .empty-state {
+        padding: 42px 20px !important;
+        text-align: center !important;
+        color: #7b8799;
     }
 
-    .pagination {
-        margin-top: 18px;
+    .pagination { margin-top: 18px; }
+
+    @media (max-width: 900px) {
+        .toolbar { grid-template-columns: 1fr 150px; }
+        .toolbar .secondary-action { width: 100%; }
+        .data-table { min-width: 960px; }
+        .table-scroll { overflow-x: auto; }
     }
 
-    @media (max-width: 800px) {
-        .page-heading {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .toolbar {
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex-basis: 100%;
-        }
+    @media (max-width: 650px) {
+        .page-heading { align-items: flex-start; flex-direction: column; }
+        .toolbar { grid-template-columns: 1fr; }
+        .primary-action { width: 100%; }
     }
 </style>
 @endpush
@@ -195,11 +223,10 @@
         <div>
             <small>Staff Operations</small>
             <h1>Customer Transactions</h1>
+            <p>Manage customer service transactions from creation through completion.</p>
         </div>
 
-        <a href="{{ route('transactions.create') }}" class="primary-action">
-            + New Transaction
-        </a>
+        <a href="{{ route('transactions.create') }}" class="primary-action">+ New Transaction</a>
     </div>
 
     @if(session('success'))
@@ -216,18 +243,25 @@
             type="search"
             name="search"
             value="{{ request('search') }}"
-            placeholder="Search control number or customer name"
+            placeholder="Search control number, customer, or service"
         >
+
+        <select class="status-select" name="status" aria-label="Filter by status">
+            <option value="">All Statuses</option>
+            <option value="Pending" @selected(request('status') === 'Pending')>Pending</option>
+            <option value="Claimed" @selected(request('status') === 'Claimed')>Claimed</option>
+            <option value="Voided" @selected(request('status') === 'Voided')>Voided</option>
+        </select>
 
         <button type="submit" class="secondary-action">Search</button>
 
-        @if(request('search'))
+        @if(request()->filled('search') || request()->filled('status'))
             <a href="{{ route('transactions.index') }}" class="secondary-action">Clear</a>
         @endif
     </form>
 
     <div class="table-card">
-        <div style="overflow-x:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -244,38 +278,41 @@
                     @forelse($transactions as $transaction)
                         <tr>
                             <td class="control-number">{{ $transaction->control_number }}</td>
-                            <td>{{ $transaction->customer_name }}</td>
-                            <td>{{ $transaction->service_type }}</td>
+                            <td title="{{ $transaction->customer_name }}">{{ $transaction->customer_name }}</td>
+                            <td title="{{ $transaction->service_type }}">{{ $transaction->service_type }}</td>
                             <td>{{ $transaction->transaction_date->format('M d, Y') }}</td>
                             <td>
-                                <span class="status {{ strtolower($transaction->status) }}">
-                                    {{ $transaction->status }}
-                                </span>
+                                <span class="status {{ strtolower($transaction->status) }}">{{ $transaction->status }}</span>
                             </td>
                             <td>
-                                <div class="row-actions">
-                                    <a href="{{ route('transactions.show', $transaction) }}">View</a>
-                                    @if($transaction->status !== 'Voided')
-                                        <a href="{{ route('transactions.edit', $transaction) }}">Edit</a>
+                                <div class="action-group">
+                                    <a class="action-btn action-view" href="{{ route('transactions.show', $transaction) }}">View</a>
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('transactions.destroy', $transaction) }}"
-                                            onsubmit="return confirm('Void this transaction?');"
-                                        >
+                                    @if($transaction->status === 'Pending')
+                                        <a class="action-btn action-edit" href="{{ route('transactions.edit', $transaction) }}">Edit</a>
+
+                                        <form method="POST" action="{{ route('transactions.claim', $transaction) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="action-btn action-claim">Claim</button>
+                                        </form>
+
+                                        <form method="POST" action="{{ route('transactions.destroy', $transaction) }}" onsubmit="return confirm('Void this pending transaction?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="danger-action">Void</button>
+                                            <button type="submit" class="action-btn action-void">Void</button>
                                         </form>
+                                    @elseif($transaction->status === 'Claimed')
+                                        <span class="action-btn action-locked">Locked</span>
+                                    @else
+                                        <span class="action-btn action-locked">Voided</span>
                                     @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:34px; color:#7b8799;">
-                                No transactions found.
-                            </td>
+                            <td colspan="6" class="empty-state">No transactions found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -283,9 +320,7 @@
         </div>
     </div>
 
-    <div class="pagination">
-        {{ $transactions->links() }}
-    </div>
+    <div class="pagination">{{ $transactions->links() }}</div>
 </div>
 
 </x-staff-layout>

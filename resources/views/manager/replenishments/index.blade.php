@@ -107,7 +107,7 @@
                                 @endif
                             </td>
                             <td class="num">
-                                <a href="{{ route('products.edit', $product) }}" class="btn small">Update stock</a>
+                                <a href="{{ route('products.edit', $product) }}" class="btn small replenishment-action">Update stock</a>
                             </td>
                         </tr>
                     @endforeach

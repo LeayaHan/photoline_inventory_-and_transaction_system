@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\InventoryAuditController;
 use App\Http\Controllers\ManagerAuditController;
+use App\Http\Controllers\ManagerInventoryController;
 use App\Http\Controllers\ManagerTransactionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
@@ -116,6 +117,11 @@ Route::middleware(['auth'])->group(function () {
         TransactionController::class
     );
 
+    Route::patch(
+        '/transactions/{transaction}/claim',
+        [TransactionController::class, 'claim']
+    )->name('transactions.claim');
+
 
     /*
     |--------------------------------------------------------------------------
@@ -190,6 +196,11 @@ Route::middleware(['auth'])->group(function () {
                 '/transactions/{transaction}',
                 [ManagerTransactionController::class, 'show']
             )->name('transactions.show');
+
+            Route::get(
+                '/inventory',
+                [ManagerInventoryController::class, 'index']
+            )->name('inventory.index');
 
             Route::get(
                 '/audits',

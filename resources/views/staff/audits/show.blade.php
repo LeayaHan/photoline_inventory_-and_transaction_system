@@ -1,128 +1,22 @@
-<x-staff-layout title="Inventory Audit">
-
+<x-staff-layout title="Inventory Audit | Photoline">
 @push('styles')
 <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
-        }
-
-        button {
-            padding: 8px;
-        }
-
-        .success {
-            padding: 10px;
-            margin-bottom: 15px;
-            background: #e8f5e9;
-        }
-
-        .shortage {
-            font-weight: bold;
-        }
-
-        .excess {
-            font-weight: bold;
-        }
-
-        .page-card {
-            width: 90%;
-            max-width: 1200px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-        }
+.audit-page{width:min(1180px,calc(100% - 36px));margin:0 auto;padding:32px 0 55px}.audit-card{padding:28px;border:1px solid #e5eaf2;border-radius:16px;background:#fff;box-shadow:0 10px 30px rgba(20,45,80,.05)}.audit-heading{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.audit-heading small{color:#ed2b24;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}.audit-heading h1{margin:6px 0 7px;font-size:29px}.audit-heading p{margin:0;color:#68738a;font-size:13px}.status{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800}.status.ongoing{background:#eaf2ff;color:#1769e8}.status.completed{background:#eaf8f0;color:#20754a}.notice{margin:18px 0;padding:12px 14px;border-radius:9px;font-size:12px}.notice.success{color:#206c43;background:#ebf8f0;border:1px solid #ccebd9}.notice.error{color:#a72520;background:#fff0ef;border:1px solid #f5cecb}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.meta-card{padding:14px;border:1px solid #e5eaf2;border-radius:10px;background:#fafbfd}.meta-card small{display:block;color:#7b8799;font-size:10px;text-transform:uppercase;letter-spacing:.5px}.meta-card strong{display:block;margin-top:5px;color:#13233f;font-size:14px}.audit-note{margin-bottom:18px;padding:12px 14px;border:1px solid #dbe7f6;border-radius:9px;color:#3d5876;background:#f5f9ff;font-size:12px}.audit-actions{display:flex;gap:8px;margin:20px 0}.audit-button,.audit-cancel{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border:0;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}.audit-button{color:#fff;background:#1769e8}.audit-complete{color:#fff;background:#1b8b5a}.audit-cancel{color:#536078;background:#eef3f9}.audit-table-wrap{overflow-x:auto;border:1px solid #e5eaf2;border-radius:12px}.audit-table{width:100%;border-collapse:collapse}.audit-table th,.audit-table td{padding:13px 14px;border-bottom:1px solid #edf0f5;text-align:left;font-size:12px}.audit-table th{color:#7b8799;background:#fafbfd;font-size:10px;text-transform:uppercase;letter-spacing:.6px}.audit-table tr:last-child td{border-bottom:0}.shortage{color:#b42318;font-weight:800}.excess{color:#1769e8;font-weight:800}.matched{color:#20754a;font-weight:800}@media(max-width:700px){.audit-heading{flex-direction:column}.meta{grid-template-columns:1fr}}
 </style>
 @endpush
-
-<div class="page-card">
-
-<h1>Inventory Audit #{{ $audit->id }}</h1>
-
-@if(session('success'))
-    <div class="success">
-        {{ session('success') }}
-    </div>
-@endif
-
-<p>
-    <strong>Audit Date:</strong>
-    {{ $audit->audit_date->format('Y-m-d') }}
-</p>
-
-<p>
-    <strong>Auditor:</strong>
-    {{ $audit->user->name }}
-</p>
-
-<p>
-    <strong>Status:</strong>
-    {{ $audit->status }}
-</p>
-
-@if($audit->status === 'Ongoing')
-    <a href="{{ route('audits.edit', $audit) }}">Edit Audit</a>
-
-    <form
-        method="POST"
-        action="{{ route('audits.complete', $audit) }}"
-        style="display:inline;"
-    >
-        @csrf
-        @method('PUT')
-
-        <button type="submit">Complete Audit</button>
-    </form>
-@endif
-
-<table>
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>SKU</th>
-            <th>POS Quantity</th>
-            <th>Physical Count</th>
-            <th>Discrepancy</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach($audit->details as $detail)
-            <tr>
-                <td>{{ $detail->product->product_name }}</td>
-                <td>{{ $detail->product->sku }}</td>
-                <td>{{ $detail->recorded_qty }}</td>
-                <td>{{ $detail->counted_qty }}</td>
-                <td>
-                    @if($detail->discrepancy < 0)
-                        <span class="shortage">
-                            {{ $detail->discrepancy }} Shortage
-                        </span>
-                    @elseif($detail->discrepancy > 0)
-                        <span class="excess">
-                            +{{ $detail->discrepancy }} Excess
-                        </span>
-                    @else
-                        No Discrepancy
-                    @endif
-                </td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
-
-<br>
-
-<a href="{{ route('audits.index') }}">Back to Audits</a>
-
-</div>
-
+<div class="audit-page"><div class="audit-card">
+<div class="audit-heading"><div><small>Staff Inventory</small><h1>Inventory Audit #{{ $audit->id }}</h1><p>Audit record and physical verification details.</p></div><span class="status {{ strtolower($audit->status) }}">{{ $audit->status }}</span></div>
+@if(session('success'))<div class="notice success">{{ session('success') }}</div>@endif
+@if(session('error'))<div class="notice error">{{ session('error') }}</div>@endif
+<div class="meta"><div class="meta-card"><small>Audit Date</small><strong>{{ $audit->audit_date->format('M d, Y') }}</strong></div><div class="meta-card"><small>Auditor</small><strong>{{ $audit->user->name }}</strong></div><div class="meta-card"><small>Items Audited</small><strong>{{ $audit->details->count() }}</strong></div></div>
+<div class="audit-note"><strong>Inventory link:</strong> Recorded Qty is the inventory quantity captured when the audit started. Once this audit is completed, each item's Physical Count becomes its new current inventory quantity.</div>
+@if($audit->status === 'Ongoing')<div class="audit-actions"><a class="audit-button" href="{{ route('audits.edit',$audit) }}">Edit Counts</a><form method="POST" action="{{ route('audits.complete',$audit) }}" onsubmit="return confirm('Complete this audit and update the current inventory quantities from the physical counts?');">@csrf @method('PUT')<button class="audit-button audit-complete" type="submit">Complete Audit</button></form><a class="audit-cancel" href="{{ route('audits.index') }}">Back</a></div>@else<div class="audit-actions"><a class="audit-cancel" href="{{ route('audits.index') }}">Back to Audits</a></div>@endif
+<div class="audit-table-wrap"><table class="audit-table"><thead><tr><th>Product</th><th>SKU</th><th>Recorded Qty</th><th>Physical Count</th><th>Discrepancy</th></tr></thead><tbody>
+@forelse($audit->details as $detail)
+<tr><td>{{ $detail->product->product_name }}</td><td>{{ $detail->product->sku }}</td><td>{{ number_format($detail->recorded_qty) }}</td><td>{{ number_format($detail->counted_qty) }}</td><td>@if($detail->discrepancy < 0)<span class="shortage">{{ $detail->discrepancy }} Shortage</span>@elseif($detail->discrepancy > 0)<span class="excess">+{{ $detail->discrepancy }} Excess</span>@else<span class="matched">No Discrepancy</span>@endif</td></tr>
+@empty
+<tr><td colspan="5" style="text-align:center;padding:34px;color:#7b8799">No audit items found.</td></tr>
+@endforelse
+</tbody></table></div>
+</div></div>
 </x-staff-layout>

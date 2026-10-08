@@ -13,6 +13,7 @@
     </style>
 
     @stack('styles')
+    @include('layouts.partials.action-styles')
 </head>
 <body>
     <x-main-nav

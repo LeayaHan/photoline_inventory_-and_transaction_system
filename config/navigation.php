@@ -24,6 +24,7 @@ return [
     'manager' => [
         ['Dashboard',        'dashboard',                    'dashboard'],
         ['Transactions',     'manager.transactions.index',   'manager.transactions.*'],
+        ['Inventory',        'manager.inventory.index',       'manager.inventory.*'],
         ['Inventory Audits', 'manager.audits.index',         'manager.audits.*'],
         ['Reports',          'reports.index',                'reports.*'],
         ['Users',            'users.index',                  'users.*'],

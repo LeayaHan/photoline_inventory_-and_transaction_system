@@ -53,7 +53,11 @@ class ProductController extends Controller
             'product_name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
             'unit' => ['required', 'string', 'max:50'],
+            'quantity' => ['required', 'integer', 'min:0'],
+            'reorder_level' => ['nullable', 'integer', 'min:0'],
         ]);
+
+        $validated['reorder_level'] = $validated['reorder_level'] ?? 5;
 
         Product::create($validated);
 

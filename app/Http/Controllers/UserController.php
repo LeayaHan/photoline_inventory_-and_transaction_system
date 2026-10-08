@@ -9,52 +9,74 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index()
+    private function authorizeManager(): void
     {
         if (!auth()->check()) {
-            return redirect()->route('login');
+            abort(401);
         }
 
         if (!auth()->user()->isManager()) {
             abort(403, 'Unauthorized access.');
         }
+    }
+
+    public function index(Request $request)
+    {
+        $this->authorizeManager();
+
+        $search = trim((string) $request->input('search'));
 
         $users = User::where('role', 'staff')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('employee_id', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('position', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->orderByDesc('is_active')
             ->orderBy('last_name')
             ->orderBy('first_name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('manager.users.index', compact('users'));
+        $staffTotal = User::where('role', 'staff')->count();
+        $activeStaff = User::where('role', 'staff')->where('is_active', true)->count();
+        $inactiveStaff = User::where('role', 'staff')->where('is_active', false)->count();
+
+        return view('manager.users.index', compact(
+            'users',
+            'staffTotal',
+            'activeStaff',
+            'inactiveStaff'
+        ));
     }
 
     public function create()
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-
-        if (!auth()->user()->isManager()) {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeManager();
 
         return view('manager.users.create');
     }
 
     public function store(Request $request)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-
-        if (!auth()->user()->isManager()) {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeManager();
 
         $validated = $request->validate([
+            'employee_id' => ['required', 'string', 'max:50', 'unique:users,employee_id'],
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
+            'position' => ['required', 'string', 'max:100'],
+            'date_hired' => ['required', 'date', 'before_or_equal:today'],
+            'phone' => ['required', 'string', 'max:30'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'address' => ['required', 'string', 'max:255'],
+            'emergency_contact_name' => ['required', 'string', 'max:100'],
+            'emergency_contact_phone' => ['required', 'string', 'max:30'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -65,6 +87,7 @@ class UserController extends Controller
         ])));
 
         User::create([
+            'employee_id' => $validated['employee_id'],
             'name' => $fullName,
             'first_name' => $validated['first_name'],
             'middle_name' => $validated['middle_name'] ?? null,
@@ -72,22 +95,21 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'staff',
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'position' => $validated['position'],
+            'date_hired' => $validated['date_hired'],
+            'emergency_contact_name' => $validated['emergency_contact_name'],
+            'emergency_contact_phone' => $validated['emergency_contact_phone'],
+            'is_active' => true,
         ]);
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Staff account created successfully.');
+        return redirect()->route('users.index')->with('success', 'Staff account created successfully.');
     }
 
     public function edit(User $user)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-
-        if (!auth()->user()->isManager()) {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeManager();
 
         if ($user->role !== 'staff') {
             abort(403, 'Only staff accounts can be managed here.');
@@ -98,30 +120,26 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-
-        if (!auth()->user()->isManager()) {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeManager();
 
         if ($user->role !== 'staff') {
             abort(403, 'Only staff accounts can be managed here.');
         }
 
         $validated = $request->validate([
+            'employee_id' => ['required', 'string', 'max:50', Rule::unique('users', 'employee_id')->ignore($user->id)],
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($user->id),
-            ],
+            'position' => ['required', 'string', 'max:100'],
+            'date_hired' => ['required', 'date', 'before_or_equal:today'],
+            'phone' => ['required', 'string', 'max:30'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'address' => ['required', 'string', 'max:255'],
+            'emergency_contact_name' => ['required', 'string', 'max:100'],
+            'emergency_contact_phone' => ['required', 'string', 'max:30'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
 
         $fullName = trim(implode(' ', array_filter([
@@ -131,11 +149,19 @@ class UserController extends Controller
         ])));
 
         $data = [
+            'employee_id' => $validated['employee_id'],
             'name' => $fullName,
             'first_name' => $validated['first_name'],
             'middle_name' => $validated['middle_name'] ?? null,
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'position' => $validated['position'],
+            'date_hired' => $validated['date_hired'],
+            'emergency_contact_name' => $validated['emergency_contact_name'],
+            'emergency_contact_phone' => $validated['emergency_contact_phone'],
+            'is_active' => $request->boolean('is_active'),
         ];
 
         if (!empty($validated['password'])) {
@@ -144,20 +170,12 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Staff account updated successfully.');
+        return redirect()->route('users.index')->with('success', 'Staff account updated successfully.');
     }
 
     public function destroy(User $user)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-
-        if (!auth()->user()->isManager()) {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeManager();
 
         if ($user->role !== 'staff') {
             abort(403, 'Only staff accounts can be deleted here.');
@@ -165,8 +183,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Staff account deleted successfully.');
+        return redirect()->route('users.index')->with('success', 'Staff account deleted successfully.');
     }
 }

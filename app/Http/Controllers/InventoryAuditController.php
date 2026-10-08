@@ -48,7 +48,6 @@ class InventoryAuditController extends Controller
             'audit_date' => ['required', 'date'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.product_id' => ['required', 'exists:products,id'],
-            'products.*.recorded_qty' => ['required', 'integer', 'min:0'],
             'products.*.counted_qty' => ['required', 'integer', 'min:0'],
         ]);
 
@@ -68,12 +67,15 @@ class InventoryAuditController extends Controller
             ]);
 
             foreach ($validated['products'] as $product) {
+                $inventoryItem = Product::findOrFail($product['product_id']);
+                $recordedQty = (int) $inventoryItem->quantity;
+
                 AuditDetail::create([
                     'inventory_audit_id' => $audit->id,
-                    'product_id' => $product['product_id'],
-                    'recorded_qty' => $product['recorded_qty'],
+                    'product_id' => $inventoryItem->id,
+                    'recorded_qty' => $recordedQty,
                     'counted_qty' => $product['counted_qty'],
-                    'discrepancy' => $product['counted_qty'] - $product['recorded_qty'],
+                    'discrepancy' => $product['counted_qty'] - $recordedQty,
                 ]);
             }
 
@@ -107,7 +109,6 @@ class InventoryAuditController extends Controller
             'audit_date' => ['required', 'date'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.detail_id' => ['required', 'exists:audit_details,id'],
-            'products.*.recorded_qty' => ['required', 'integer', 'min:0'],
             'products.*.counted_qty' => ['required', 'integer', 'min:0'],
         ]);
 
@@ -120,9 +121,8 @@ class InventoryAuditController extends Controller
                     ->firstOrFail();
 
                 $detail->update([
-                    'recorded_qty' => $product['recorded_qty'],
                     'counted_qty' => $product['counted_qty'],
-                    'discrepancy' => $product['counted_qty'] - $product['recorded_qty'],
+                    'discrepancy' => $product['counted_qty'] - $detail->recorded_qty,
                 ]);
             }
         });
@@ -140,7 +140,17 @@ class InventoryAuditController extends Controller
                 ->with('success', 'This audit is already completed.');
         }
 
-        $audit->update(['status' => 'Completed']);
+        DB::transaction(function () use ($audit) {
+            $audit->load('details');
+
+            foreach ($audit->details as $detail) {
+                Product::whereKey($detail->product_id)->update([
+                    'quantity' => $detail->counted_qty,
+                ]);
+            }
+
+            $audit->update(['status' => 'Completed']);
+        });
 
         return redirect()
             ->route('audits.show', $audit)
