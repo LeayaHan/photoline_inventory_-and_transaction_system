@@ -5,8 +5,12 @@
 
     <style>
         :root {
-            --nav-bg: #222;
-            --page-bg: #f4f4f4;
+            --staff-blue: #1769e8;
+            --staff-blue-dark: #0b47b7;
+            --staff-red: #ed2b24;
+            --staff-page: #f5f8fc;
+            --staff-ink: #172033;
+            --staff-muted: #68738a;
         }
 
         @include('layouts.partials.nav-styles')
@@ -14,13 +18,17 @@
 
     @stack('styles')
 </head>
-<body>
+
+<body class="staff-theme">
     <x-main-nav
         :links="config('navigation.staff')"
         role-label="Staff"
+        theme="staff"
     />
 
-    {{ $slot }}
+    <main class="staff-page-content">
+        {{ $slot }}
+    </main>
 
     @stack('scripts')
 </body>

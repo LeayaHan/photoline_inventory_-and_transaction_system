@@ -6,6 +6,7 @@ use App\Models\AuditDetail;
 use App\Models\InventoryAudit;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class InventoryAuditController extends Controller
@@ -25,10 +26,7 @@ class InventoryAuditController extends Controller
             });
         }
 
-        $audits = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $audits = $query->latest()->paginate(10)->withQueryString();
 
         return view('staff.audits.index', compact('audits'));
     }
@@ -36,13 +34,17 @@ class InventoryAuditController extends Controller
     public function create()
     {
         $products = Product::orderBy('product_name')->get();
+        $formToken = (string) Str::uuid();
 
-        return view('staff.audits.create', compact('products'));
+        session()->put("audit_form_tokens.{$formToken}", true);
+
+        return view('staff.audits.create', compact('products', 'formToken'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'form_token' => ['required', 'string', 'uuid'],
             'audit_date' => ['required', 'date'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.product_id' => ['required', 'exists:products,id'],
@@ -50,7 +52,15 @@ class InventoryAuditController extends Controller
             'products.*.counted_qty' => ['required', 'integer', 'min:0'],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $tokenKey = "audit_form_tokens.{$validated['form_token']}";
+
+        if (! session()->pull($tokenKey, false)) {
+            return redirect()
+                ->route('audits.index')
+                ->with('error', 'This audit form was already submitted.');
+        }
+
+        $audit = DB::transaction(function () use ($validated) {
             $audit = InventoryAudit::create([
                 'user_id' => auth()->id(),
                 'audit_date' => $validated['audit_date'],
@@ -66,12 +76,12 @@ class InventoryAuditController extends Controller
                     'discrepancy' => $product['counted_qty'] - $product['recorded_qty'],
                 ]);
             }
+
+            return $audit;
         });
 
-        $audit = InventoryAudit::latest()->first();
-
         return redirect()
-            ->route('staff.audits.show', $audit)
+            ->route('audits.show', $audit)
             ->with('success', 'Inventory audit created successfully.');
     }
 
@@ -91,6 +101,8 @@ class InventoryAuditController extends Controller
 
     public function update(Request $request, InventoryAudit $audit)
     {
+        abort_if($audit->status === 'Completed', 403, 'Completed audits cannot be edited.');
+
         $validated = $request->validate([
             'audit_date' => ['required', 'date'],
             'products' => ['required', 'array', 'min:1'],
@@ -100,9 +112,7 @@ class InventoryAuditController extends Controller
         ]);
 
         DB::transaction(function () use ($validated, $audit) {
-            $audit->update([
-                'audit_date' => $validated['audit_date'],
-            ]);
+            $audit->update(['audit_date' => $validated['audit_date']]);
 
             foreach ($validated['products'] as $product) {
                 $detail = AuditDetail::where('id', $product['detail_id'])
@@ -118,18 +128,22 @@ class InventoryAuditController extends Controller
         });
 
         return redirect()
-            ->route('staff.audits.show', $audit)
+            ->route('audits.show', $audit)
             ->with('success', 'Inventory audit updated successfully.');
     }
 
     public function complete(InventoryAudit $audit)
     {
-        $audit->update([
-            'status' => 'Completed',
-        ]);
+        if ($audit->status === 'Completed') {
+            return redirect()
+                ->route('audits.show', $audit)
+                ->with('success', 'This audit is already completed.');
+        }
+
+        $audit->update(['status' => 'Completed']);
 
         return redirect()
-            ->route('staff.audits.show', $audit)
+            ->route('audits.show', $audit)
             ->with('success', 'Inventory audit marked as completed.');
     }
 }

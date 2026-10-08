@@ -18,6 +18,7 @@
     <x-main-nav
         :links="config('navigation.manager')"
         role-label="Branch Manager"
+        theme="manager"
     />
 
     {{ $slot }}

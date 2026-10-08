@@ -1,40 +1,40 @@
 <x-guest-layout>
 
-    <div class="mb-6 text-center">
-        <h1 class="text-xl font-semibold text-gray-800">
-            Welcome
-        </h1>
+    <div class="photoline-login-heading">
+        <p class="photoline-login-kicker">Welcome</p>
 
-        <p class="text-sm text-gray-500 mt-1">
-            Log in to your Photoline account
+        <h2>Sign in to Photoline</h2>
+
+        <p>
+            Enter your account details to continue to your workspace.
         </p>
     </div>
 
     <x-auth-session-status
-        class="mb-4"
+        class="mb-4 photoline-status"
         :status="session('status')"
     />
 
     <form method="POST" action="{{ route('login') }}">
-
         @csrf
 
-        <!-- Email -->
         <div>
             <x-input-label
                 for="email"
                 :value="__('Email')"
+                class="photoline-field-label"
             />
 
             <x-text-input
                 id="email"
-                class="block mt-1 w-full"
+                class="block photoline-field"
                 type="email"
                 name="email"
                 :value="old('email')"
                 required
                 autofocus
                 autocomplete="username"
+                placeholder="Enter your email address"
             />
 
             <x-input-error
@@ -43,73 +43,61 @@
             />
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-
+        <div class="mt-5">
             <x-input-label
                 for="password"
                 :value="__('Password')"
+                class="photoline-field-label"
             />
 
             <x-text-input
                 id="password"
-                class="block mt-1 w-full"
+                class="block photoline-field"
                 type="password"
                 name="password"
                 required
                 autocomplete="current-password"
+                placeholder="Enter your password"
             />
 
             <x-input-error
                 :messages="$errors->get('password')"
                 class="mt-2"
             />
-
         </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-
+        <br>
+        <div class="flex items-center justify-between mt-5">
             <label
                 for="remember_me"
-                class="inline-flex items-center"
+                class="inline-flex items-center photoline-check"
             >
-
                 <input
                     id="remember_me"
                     type="checkbox"
-                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                    class="rounded border-gray-300 shadow-sm focus:ring-blue-500"
                     name="remember"
                 >
 
-                <span class="ms-2 text-sm text-gray-600">
+                <span class="ms-2 text-sm">
                     {{ __('Remember me') }}
                 </span>
-
             </label>
 
-        </div>
-
-        <!-- Buttons -->
-        <div class="flex items-center justify-end mt-5">
-
             @if (Route::has('password.request'))
-
                 <a
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    class="text-sm underline rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 photoline-forgot"
                     href="{{ route('password.request') }}"
                 >
-                    {{ __('Forgot your password?') }}
+                    {{ __('Forgot password?') }}
                 </a>
-
             @endif
-
-            <x-primary-button class="ms-3">
+        </div>
+        <br>
+        <div class="mt-7">
+            <x-primary-button class="w-full justify-center photoline-login-button">
                 {{ __('Log in') }}
             </x-primary-button>
-
         </div>
-
     </form>
 
 </x-guest-layout>

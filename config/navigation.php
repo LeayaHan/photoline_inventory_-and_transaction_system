@@ -17,6 +17,7 @@ return [
     'staff' => [
         ['Dashboard',    'dashboard',                 'dashboard'],
         ['Transactions', 'transactions.index',        'transactions.*'],
+        ['Inventory',    'inventory.index',            'inventory.*'],
         ['Audits',       'audits.index',              'audits.*'],
     ],
 

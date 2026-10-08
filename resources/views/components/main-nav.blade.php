@@ -1,7 +1,25 @@
-@props(['links', 'roleLabel'])
+@props([
+    'links',
+    'roleLabel',
+    'theme' => 'staff',
+])
 
-<div class="navbar">
-    <h2>Photoline Abreeza</h2>
+<nav class="navbar {{ $theme === 'manager' ? 'navbar-manager' : 'navbar-staff' }}">
+    <div class="nav-brand">
+        <div class="nav-logo-box">
+            <img src="{{ asset('images/photoline-logo.jpg') }}" alt="Photoline">
+        </div>
+
+        <div class="nav-brand-text">
+            <strong>Photoline</strong>
+            <span>Abreeza</span>
+        </div>
+    </div>
+
+    <div class="nav-role">
+        <span class="role-dot"></span>
+        {{ $roleLabel }}
+    </div>
 
     <div class="nav-links">
         @foreach ($links as [$label, $route, $pattern])
@@ -16,11 +34,14 @@
     </div>
 
     <div class="user-area">
-        <span>{{ auth()->user()->name }} — {{ $roleLabel }}</span>
+        <div class="user-info">
+            <span class="user-name">{{ auth()->user()->name }}</span>
+            <span class="user-role">{{ $roleLabel }}</span>
+        </div>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </div>
-</div>
+</nav>

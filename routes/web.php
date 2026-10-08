@@ -3,6 +3,7 @@
 use App\Http\Controllers\InventoryAuditController;
 use App\Http\Controllers\ManagerAuditController;
 use App\Http\Controllers\ManagerTransactionController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -77,9 +78,20 @@ Route::get('/dashboard', function () {
         ->take(5)
         ->get();
 
+    $todayTransactions = Transaction::whereDate('created_at', today())->count();
+    $pendingTransactions = Transaction::where('status', 'Pending')->count();
+    $productCount = Product::count();
+    $ongoingAudits = InventoryAudit::where('status', 'Ongoing')->count();
+
     return view(
         'staff.dashboard',
-        compact('transactions')
+        compact(
+            'transactions',
+            'todayTransactions',
+            'pendingTransactions',
+            'productCount',
+            'ongoingAudits'
+        )
     );
 
 })->middleware(['auth'])->name('dashboard');
@@ -103,6 +115,18 @@ Route::middleware(['auth'])->group(function () {
         'transactions',
         TransactionController::class
     );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Inventory Items
+    |--------------------------------------------------------------------------
+    */
+
+    Route::resource(
+        'inventory',
+        ProductController::class
+    )->except(['show']);
 
 
     /*

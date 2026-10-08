@@ -8,8 +8,15 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
+    private function ensureStaff(): void
+    {
+        abort_unless(auth()->user()?->isStaff(), 403);
+    }
+
     public function index(Request $request)
     {
+        $this->ensureStaff();
+
         $query = Product::query();
 
         if ($request->filled('search')) {
@@ -27,68 +34,78 @@ class ProductController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('inventory.index', compact('products'));
+        return view('staff.inventory.index', compact('products'));
     }
 
     public function create()
     {
-        return view('inventory.create');
+        $this->ensureStaff();
+
+        return view('staff.inventory.create');
     }
 
     public function store(Request $request)
     {
-        Product::create($this->validated($request));
+        $this->ensureStaff();
+
+        $validated = $request->validate([
+            'sku' => ['required', 'string', 'max:100', 'unique:products,sku'],
+            'product_name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:100'],
+            'unit' => ['required', 'string', 'max:50'],
+        ]);
+
+        Product::create($validated);
 
         return redirect()
-            ->route('products.index')
+            ->route('inventory.index')
             ->with('success', 'Inventory item added successfully.');
     }
 
-    public function edit(Product $product)
+    public function edit(Product $inventory)
     {
-        return view('inventory.edit', compact('product'));
+        $this->ensureStaff();
+
+        return view('staff.inventory.edit', ['product' => $inventory]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Product $inventory)
     {
-        $product->update($this->validated($request, $product));
+        $this->ensureStaff();
 
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'Inventory item updated successfully.');
-    }
-
-    public function destroy(Product $product)
-    {
-        // Items that were already counted in an audit must stay, otherwise
-        // the audit history would lose its records.
-        if ($product->auditDetails()->exists()) {
-            return redirect()
-                ->route('products.index')
-                ->with('error', 'This item is part of an inventory audit and cannot be deleted. Set its quantity to 0 instead.');
-        }
-
-        $product->delete();
-
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'Inventory item deleted successfully.');
-    }
-
-    private function validated(Request $request, ?Product $product = null): array
-    {
-        return $request->validate([
+        $validated = $request->validate([
             'sku' => [
                 'required',
                 'string',
-                'max:50',
-                Rule::unique('products', 'sku')->ignore($product?->id),
+                'max:100',
+                Rule::unique('products', 'sku')->ignore($inventory->id),
             ],
             'product_name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:100'],
             'unit' => ['required', 'string', 'max:50'],
-            'quantity' => ['required', 'integer', 'min:0'],
-            'reorder_level' => ['required', 'integer', 'min:0'],
         ]);
+
+        $inventory->update($validated);
+
+        return redirect()
+            ->route('inventory.index')
+            ->with('success', 'Inventory item updated successfully.');
+    }
+
+    public function destroy(Product $inventory)
+    {
+        $this->ensureStaff();
+
+        if ($inventory->auditDetails()->exists()) {
+            return redirect()
+                ->route('inventory.index')
+                ->with('error', 'This item cannot be deleted because it is already used in an inventory audit.');
+        }
+
+        $inventory->delete();
+
+        return redirect()
+            ->route('inventory.index')
+            ->with('success', 'Inventory item deleted successfully.');
     }
 }

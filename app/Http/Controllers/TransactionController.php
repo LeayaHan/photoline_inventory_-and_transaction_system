@@ -8,30 +8,16 @@ use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
-    /**
-     * Display all transactions.
-     */
     public function index(Request $request)
     {
         $query = Transaction::query();
 
         if ($request->filled('search')) {
-
             $search = $request->search;
 
             $query->where(function ($q) use ($search) {
-
-                $q->where(
-                    'control_number',
-                    'like',
-                    "%{$search}%"
-                )
-
-                ->orWhere(
-                    'customer_name',
-                    'like',
-                    "%{$search}%"
-                );
+                $q->where('control_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%");
             });
         }
 
@@ -40,175 +26,88 @@ class TransactionController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view(
-            'staff.transactions.index',
-            compact('transactions')
-        );
+        return view('staff.transactions.index', compact('transactions'));
     }
 
-    /**
-     * Show create transaction form.
-     */
     public function create()
     {
-        return view('staff.transactions.create');
+        $formToken = (string) Str::uuid();
+
+        session()->put("transaction_form_tokens.{$formToken}", true);
+
+        return view('staff.transactions.create', compact('formToken'));
     }
 
-    /**
-     * Store a new transaction.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'service_type' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'transaction_date' => [
-                'required',
-                'date',
-            ],
-
-            'item_description' => [
-                'nullable',
-                'string',
-            ],
+            'form_token' => ['required', 'string', 'uuid'],
+            'customer_name' => ['required', 'string', 'max:255'],
+            'service_type' => ['required', 'string', 'max:255'],
+            'transaction_date' => ['required', 'date'],
+            'item_description' => ['nullable', 'string'],
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Generate unique control number
-        |--------------------------------------------------------------------------
-        */
+        $tokenKey = "transaction_form_tokens.{$validated['form_token']}";
+
+        if (! session()->pull($tokenKey, false)) {
+            return redirect()
+                ->route('transactions.index')
+                ->with('error', 'This transaction form was already submitted.');
+        }
 
         do {
+            $controlNumber = 'TRX-' . strtoupper(Str::random(8));
+        } while (Transaction::where('control_number', $controlNumber)->exists());
 
-            $controlNumber =
-                'TRX-' . strtoupper(Str::random(8));
-
-        } while (
-            Transaction::where(
-                'control_number',
-                $controlNumber
-            )->exists()
-        );
-
-        $validated['control_number'] = $controlNumber;
-
-        $validated['status'] = 'Pending';
-
-        $validated['created_by'] = auth()->id();
-
-        Transaction::create($validated);
+        Transaction::create([
+            'control_number' => $controlNumber,
+            'customer_name' => $validated['customer_name'],
+            'service_type' => $validated['service_type'],
+            'transaction_date' => $validated['transaction_date'],
+            'item_description' => $validated['item_description'] ?? null,
+            'status' => 'Pending',
+            'created_by' => auth()->id(),
+        ]);
 
         return redirect()
-            ->route('staff.transactions.index')
-            ->with(
-                'success',
-                'Transaction created successfully.'
-            );
+            ->route('transactions.index')
+            ->with('success', 'Transaction created successfully.');
     }
 
-    /**
-     * Display one transaction.
-     */
     public function show(Transaction $transaction)
     {
-        return view(
-            'staff.transactions.show',
-            compact('transaction')
-        );
+        return view('staff.transactions.show', compact('transaction'));
     }
 
-    /**
-     * Show edit form.
-     */
     public function edit(Transaction $transaction)
     {
-        return view(
-            'staff.transactions.edit',
-            compact('transaction')
-        );
+        return view('staff.transactions.edit', compact('transaction'));
     }
 
-    /**
-     * Update transaction.
-     */
-    public function update(
-        Request $request,
-        Transaction $transaction
-    ) {
+    public function update(Request $request, Transaction $transaction)
+    {
         $validated = $request->validate([
-            'customer_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'service_type' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'transaction_date' => [
-                'required',
-                'date',
-            ],
-
-            'item_description' => [
-                'nullable',
-                'string',
-            ],
-
-            'status' => [
-                'required',
-                'in:Pending,Claimed,Voided',
-            ],
+            'customer_name' => ['required', 'string', 'max:255'],
+            'service_type' => ['required', 'string', 'max:255'],
+            'transaction_date' => ['required', 'date'],
+            'item_description' => ['nullable', 'string'],
+            'status' => ['required', 'in:Pending,Claimed,Voided'],
         ]);
 
         $transaction->update($validated);
 
         return redirect()
-            ->route(
-                'staff.transactions.show',
-                $transaction
-            )
-            ->with(
-                'success',
-                'Transaction updated successfully.'
-            );
+            ->route('transactions.show', $transaction)
+            ->with('success', 'Transaction updated successfully.');
     }
 
-    /**
-     * Void transaction.
-     */
     public function destroy(Transaction $transaction)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | We do not actually delete the record.
-        | We change its status to Voided so history remains.
-        |--------------------------------------------------------------------------
-        */
-
-        $transaction->update([
-            'status' => 'Voided',
-        ]);
+        $transaction->update(['status' => 'Voided']);
 
         return redirect()
-            ->route('staff.transactions.index')
-            ->with(
-                'success',
-                'Transaction has been voided.'
-            );
+            ->route('transactions.index')
+            ->with('success', 'Transaction has been voided.');
     }
 }
