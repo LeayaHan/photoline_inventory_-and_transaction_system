@@ -1,9 +1,14 @@
-@extends('layouts.panel')
-
-@section('title', 'Inventory Audits')
+<x-manager-layout title="Inventory Audit Records - Photoline Abreeza">
 
 @push('styles')
 <style>
+        .container {
+            width: 90%;
+            max-width: 1200px;
+
+            margin: 35px auto;
+        }
+
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -11,13 +16,16 @@
 
             margin-bottom: 25px;
         }
+
         .page-header h1 {
             margin: 0 0 8px;
         }
+
         .page-header p {
             margin: 0;
             color: #6b7280;
         }
+
         .back-button {
             display: inline-block;
 
@@ -29,6 +37,7 @@
             text-decoration: none;
             border-radius: 6px;
         }
+
         .search-box {
             background: white;
             padding: 20px;
@@ -39,10 +48,12 @@
 
             margin-bottom: 25px;
         }
+
         .search-box form {
             display: flex;
             gap: 10px;
         }
+
         .search-box input {
             flex: 1;
 
@@ -53,6 +64,7 @@
 
             font-size: 14px;
         }
+
         .search-button {
             padding: 11px 18px;
 
@@ -64,6 +76,7 @@
 
             cursor: pointer;
         }
+
         .clear-button {
             display: inline-block;
 
@@ -76,6 +89,7 @@
 
             border-radius: 6px;
         }
+
         .table-card {
             background: white;
 
@@ -85,12 +99,13 @@
 
             overflow: hidden;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        th,
-        td {
+
+        th, td {
             padding: 14px 16px;
 
             text-align: left;
@@ -99,13 +114,16 @@
 
             font-size: 14px;
         }
+
         th {
             background: #f9fafb;
             font-weight: bold;
         }
+
         tr:last-child td {
             border-bottom: none;
         }
+
         .status {
             display: inline-block;
 
@@ -116,14 +134,17 @@
             font-size: 12px;
             font-weight: bold;
         }
+
         .status.ongoing {
             background: #fef3c7;
             color: #92400e;
         }
+
         .status.completed {
             background: #d1fae5;
             color: #065f46;
         }
+
         .view-button {
             display: inline-block;
 
@@ -138,6 +159,7 @@
 
             font-size: 13px;
         }
+
         .empty {
             padding: 40px;
 
@@ -145,32 +167,40 @@
 
             color: #6b7280;
         }
+
         .pagination {
             padding: 20px;
         }
-        @media (max-width: 900px) {.page-header {
+
+        @media (max-width: 900px) {
+.page-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
-            .table-card {
+
+        .table-card {
                 overflow-x: auto;
             }
-            table {
+
+        table {
                 min-width: 850px;
-            }}
-        @media (max-width: 600px) {.search-box form {
+            }
+        }
+
+        @media (max-width: 600px) {
+.search-box form {
                 flex-direction: column;
-            }}
-    
+            }
+
+        .container {
+                width: 94%;
+            }
+        }
 </style>
 @endpush
 
-@section('content')
-    
-
-
-    <div class="container">
+<div class="container">
 
         <div class="page-header">
 
@@ -185,13 +215,6 @@
                 </p>
 
             </div>
-
-            <a
-                href="{{ route('dashboard') }}"
-                class="back-button"
-            >
-                Back to Dashboard
-            </a>
 
         </div>
 
@@ -361,4 +384,5 @@
         </div>
 
     </div>
-@endsection
+
+</x-manager-layout>

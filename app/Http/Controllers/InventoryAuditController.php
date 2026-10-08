@@ -50,7 +50,7 @@ class InventoryAuditController extends Controller
             'products.*.counted_qty' => ['required', 'integer', 'min:0'],
         ]);
 
-        $audit = DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($validated) {
             $audit = InventoryAudit::create([
                 'user_id' => auth()->id(),
                 'audit_date' => $validated['audit_date'],
@@ -66,12 +66,12 @@ class InventoryAuditController extends Controller
                     'discrepancy' => $product['counted_qty'] - $product['recorded_qty'],
                 ]);
             }
-
-            return $audit;
         });
 
+        $audit = InventoryAudit::latest()->first();
+
         return redirect()
-            ->route('audits.show', $audit)
+            ->route('staff.audits.show', $audit)
             ->with('success', 'Inventory audit created successfully.');
     }
 
@@ -84,12 +84,6 @@ class InventoryAuditController extends Controller
 
     public function edit(InventoryAudit $audit)
     {
-        if ($audit->status === 'Completed') {
-            return redirect()
-                ->route('audits.show', $audit)
-                ->with('error', 'Completed audits can no longer be edited.');
-        }
-
         $audit->load('details.product');
 
         return view('staff.audits.edit', compact('audit'));
@@ -97,12 +91,6 @@ class InventoryAuditController extends Controller
 
     public function update(Request $request, InventoryAudit $audit)
     {
-        if ($audit->status === 'Completed') {
-            return redirect()
-                ->route('audits.show', $audit)
-                ->with('error', 'Completed audits can no longer be edited.');
-        }
-
         $validated = $request->validate([
             'audit_date' => ['required', 'date'],
             'products' => ['required', 'array', 'min:1'],
@@ -130,7 +118,7 @@ class InventoryAuditController extends Controller
         });
 
         return redirect()
-            ->route('audits.show', $audit)
+            ->route('staff.audits.show', $audit)
             ->with('success', 'Inventory audit updated successfully.');
     }
 
@@ -141,7 +129,7 @@ class InventoryAuditController extends Controller
         ]);
 
         return redirect()
-            ->route('audits.show', $audit)
+            ->route('staff.audits.show', $audit)
             ->with('success', 'Inventory audit marked as completed.');
     }
 }

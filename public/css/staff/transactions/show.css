@@ -1,0 +1,22 @@
+/* Staff transaction details */
+.theme-staff .row {
+    display: flex;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.theme-staff .row .label {
+    flex: 0 0 180px;
+    margin: 0;
+    color: var(--muted);
+}
+
+@media (max-width: 700px) {
+    .theme-staff .row { flex-direction: column; gap: 4px; }
+    .theme-staff .row .label { flex: none; }
+}
+
+.detail-actions {
+    margin-top: 30px;
+}

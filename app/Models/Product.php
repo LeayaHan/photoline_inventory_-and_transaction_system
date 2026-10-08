@@ -12,14 +12,7 @@ class Product extends Model
         'product_name',
         'category',
         'unit',
-        'quantity',
-        'reorder_level',
     ];
-
-    public function isLowStock(): bool
-    {
-        return $this->quantity <= $this->reorder_level;
-    }
 
     public function auditDetails(): HasMany
     {

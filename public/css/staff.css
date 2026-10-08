@@ -1,0 +1,253 @@
+/* ==========================================================================
+   Photoline – staff pages
+   Everything under body.theme-staff: dashboard, transactions, audits.
+   ========================================================================== */
+
+/* ---- Cards / page containers ------------------------------------------ */
+.theme-staff .container,
+.theme-staff .page-card,
+.theme-staff .card {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.theme-staff .container--narrow { max-width: 750px; }
+
+/* Dashboard: transparent wrapper holding several cards */
+.theme-staff .container--plain {
+    max-width: 1100px;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.theme-staff .container--plain .card {
+    width: 100%;
+    margin: 0 0 25px;
+    padding: 25px;
+}
+
+.theme-staff h1 { margin-top: 0; }
+
+.theme-staff .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.theme-staff .top h1 { margin: 0; }
+
+/* ---- Buttons & links --------------------------------------------------- */
+.theme-staff .button,
+.theme-staff button,
+.theme-staff .btn {
+    display: inline-block;
+    padding: 9px 16px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.theme-staff .button:hover,
+.theme-staff button:hover,
+.theme-staff .btn:hover { background: var(--blue-dark); }
+
+.theme-staff .btn-secondary,
+.theme-staff .back {
+    display: inline-block;
+    padding: 9px 16px;
+    background: #e5e7eb;
+    color: #111827;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.theme-staff .btn-secondary:hover,
+.theme-staff .back:hover { background: #d1d5db; }
+
+.theme-staff .btn-warning { background: var(--amber); }
+.theme-staff .btn-warning:hover { background: #d97706; }
+.theme-staff .btn-success { background: var(--green); }
+.theme-staff .btn-success:hover { background: #15803d; }
+.theme-staff .btn-danger,
+.theme-staff .void-form button { background: var(--red); }
+.theme-staff .btn-danger:hover,
+.theme-staff .void-form button:hover { background: #b91c1c; }
+
+.theme-staff .page-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0;
+}
+
+.theme-staff .page-actions form { margin: 0; }
+
+.theme-staff .actions {
+    white-space: nowrap;
+}
+
+.theme-staff .actions a {
+    margin-right: 10px;
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.theme-staff .actions a:hover { text-decoration: underline; }
+.theme-staff .void-form { display: inline; }
+
+/* ---- Forms -------------------------------------------------------------- */
+.theme-staff .form-group { margin-bottom: 20px; }
+
+.theme-staff label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.theme-staff input,
+.theme-staff textarea,
+.theme-staff select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.theme-staff input:focus,
+.theme-staff textarea:focus,
+.theme-staff select:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+.theme-staff textarea { min-height: 110px; resize: vertical; }
+
+/* Tables use compact numeric inputs */
+.theme-staff td input[type="number"] { max-width: 140px; }
+.theme-staff input[type="date"] { max-width: 220px; }
+
+.theme-staff .search {
+    margin-bottom: 25px;
+}
+
+.theme-staff .search form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.theme-staff .search input {
+    width: 320px;
+    max-width: 100%;
+}
+
+/* ---- Tables -------------------------------------------------------------- */
+.theme-staff table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.theme-staff th {
+    background: #f3f4f6;
+    text-align: left;
+    padding: 12px 14px;
+}
+
+.theme-staff td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.theme-staff tbody tr:hover { background: #f9fafb; }
+
+.theme-staff .table-wrap { overflow-x: auto; }
+
+/* ---- Messages -------------------------------------------------------------- */
+.theme-staff .success {
+    background: #dcfce7;
+    color: #166534;
+    padding: 14px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.theme-staff .error,
+.theme-staff .errors {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 14px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.theme-staff .errors ul { margin: 0; padding-left: 20px; }
+
+/* ---- Detail rows (transaction show) --------------------------------------- */
+.theme-staff .row {
+    display: flex;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.theme-staff .row .label {
+    flex: 0 0 180px;
+    margin: 0;
+    color: var(--muted);
+}
+
+/* ---- Audit discrepancy flags ---------------------------------------------- */
+.theme-staff .shortage { color: var(--red); font-weight: bold; }
+.theme-staff .excess   { color: var(--green); font-weight: bold; }
+
+/* ---- Status badges ---------------------------------------------------------- */
+.theme-staff .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.theme-staff .badge-pending   { background: #fef3c7; color: #92400e; }
+.theme-staff .badge-claimed,
+.theme-staff .badge-completed { background: #dcfce7; color: #166534; }
+.theme-staff .badge-voided    { background: #fee2e2; color: #991b1b; }
+.theme-staff .badge-ongoing   { background: #dbeafe; color: #1d4ed8; }
+
+@media (max-width: 700px) {
+    .theme-staff .container,
+    .theme-staff .page-card { padding: 20px; }
+    .theme-staff .top { flex-direction: column; align-items: flex-start; }
+    .theme-staff .row { flex-direction: column; gap: 4px; }
+    .theme-staff .row .label { flex: none; }
+}
+
+/* Secondary "link buttons" must stay grey on hover */
+.theme-staff .button.back,
+.theme-staff .button.back:hover { color: #111827; }
+.theme-staff .button.back { background: #e5e7eb; }
+.theme-staff .button.back:hover { background: #d1d5db; }
+.theme-staff .button.btn-warning { background: var(--amber); }
+.theme-staff .button.btn-warning:hover { background: #d97706; }
+.theme-staff .button.btn-success { background: var(--green); }

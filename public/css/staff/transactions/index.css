@@ -1,0 +1,29 @@
+/* Staff transactions */
+.theme-staff .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.theme-staff .top h1 { margin: 0; }
+
+.theme-staff .search { margin-bottom: 25px; }
+.theme-staff .search form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.theme-staff .search input {
+    width: 320px;
+    max-width: 100%;
+}
+
+@media (max-width: 700px) {
+    .theme-staff .top { flex-direction: column; align-items: flex-start; }
+}
+
+.theme-staff .empty-state {
+    text-align: center;
+}

@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Photoline – base styles (tokens, themes, pagination)
+   Loaded by both the staff and manager layouts.
+   ========================================================================== */
+
+:root {
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --red: #dc2626;
+    --amber: #f59e0b;
+    --green: #16a34a;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --card-radius: 10px;
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Role themes: navbar + page background */
+.theme-staff   { --nav-bg: #1f2937; --page-bg: #f3f4f6; }
+.theme-manager { --nav-bg: #111827; --page-bg: #f5f6f8; }
+
+/* --------------------------------------------------------------------------
+   Pagination (replaces Laravel's Tailwind view; see
+   resources/views/vendor/pagination/photoline.blade.php)
+   -------------------------------------------------------------------------- */
+.pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.pager-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pager-links a,
+.pager-links span {
+    min-width: 36px;
+    padding: 7px 11px;
+    text-align: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.pager-links a:hover {
+    background: #eff6ff;
+    border-color: var(--blue);
+}
+
+.pager-links .is-current {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+    font-weight: bold;
+}
+
+.pager-links .is-disabled {
+    color: #9ca3af;
+    background: #f9fafb;
+}

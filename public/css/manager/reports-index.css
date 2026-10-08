@@ -1,0 +1,171 @@
+/* Manager: reports-index */
+
+/* PAGE */
+.page { width: 92%; max-width: 1400px; margin: 35px auto; }
+.intro { margin-bottom: 20px; }
+.intro h2 { margin: 0 0 6px; font-size: 28px; }
+.intro p { margin: 0; color: #6b7280; font-size: 14px; }
+
+/* REPORT TABS */
+.report-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.tab-button {
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.tab-button:hover { background: #f3f4f6; }
+.tab-button.is-active {
+    background: #111827;
+    border-color: #111827;
+    color: white;
+}
+
+/* FILTERS */
+.control-panel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 23px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+.filter-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #4b5563;
+}
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+}
+.filter-actions { display: flex; gap: 10px; margin-top: 17px; }
+.apply-button {
+    border: none;
+    background: #111827;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.clear-button {
+    text-decoration: none;
+    background: #e5e7eb;
+    color: #374151;
+    padding: 10px 16px;
+    border-radius: 6px;
+}
+
+/* SWITCHING (only the active tab is shown) */
+.tab-panel { display: none; }
+.tab-panel.is-active { display: block; }
+
+/* REPORT BLOCK */
+.report-block {
+    background: white;
+    border-radius: 10px;
+    padding: 23px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+.report-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.report-heading h3 { margin: 0; font-size: 19px; }
+.report-heading p { margin: 5px 0 0; font-size: 12px; color: #6b7280; }
+.report-actions { display: flex; gap: 8px; }
+.export-button {
+    text-decoration: none;
+    background: #2563eb;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+.print-button {
+    border: none;
+    background: #059669;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* TABLE */
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+    background: #111827;
+    color: white;
+    text-align: left;
+    padding: 11px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+td {
+    padding: 11px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 12px;
+    white-space: nowrap;
+}
+tr:hover td { background: #f9fafb; }
+
+/* STATUS */
+.status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: bold;
+}
+.pending { background: #fef3c7; color: #92400e; }
+.claimed { background: #d1fae5; color: #065f46; }
+.voided  { background: #fee2e2; color: #991b1b; }
+.shortage { color: #dc2626; font-weight: bold; }
+.excess   { color: #d97706; font-weight: bold; }
+.matched  { color: #059669; font-weight: bold; }
+.empty { text-align: center; padding: 30px; color: #6b7280; }
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+    .filter-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 650px) {
+    .filter-grid { grid-template-columns: 1fr; }
+    .report-tabs { flex-direction: column; }
+    .report-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+/* PRINT (prints only the report currently shown) */
+@media print {
+    .report-tabs, .control-panel, .report-actions { display: none !important; }
+    body { background: white; }
+    .page { width: 100%; margin: 0; }
+    .report-block { box-shadow: none; border: 1px solid #ddd; }
+}

@@ -110,7 +110,7 @@ class TransactionController extends Controller
         Transaction::create($validated);
 
         return redirect()
-            ->route('transactions.index')
+            ->route('staff.transactions.index')
             ->with(
                 'success',
                 'Transaction created successfully.'
@@ -179,7 +179,7 @@ class TransactionController extends Controller
 
         return redirect()
             ->route(
-                'transactions.show',
+                'staff.transactions.show',
                 $transaction
             )
             ->with(
@@ -205,7 +205,7 @@ class TransactionController extends Controller
         ]);
 
         return redirect()
-            ->route('transactions.index')
+            ->route('staff.transactions.index')
             ->with(
                 'success',
                 'Transaction has been voided.'

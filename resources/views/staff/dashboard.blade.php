@@ -1,65 +1,115 @@
-@extends('layouts.panel')
+<x-staff-layout title="Dashboard">
 
-@section('title', 'Dashboard')
+@push('styles')
+<style>
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
 
-@section('content')
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+</style>
+@endpush
+
 <div class="container">
 
-    <div class="page-header">
-        <div>
-            <h1>Welcome, {{ auth()->user()->name }}</h1>
-            <p>Photoline Inventory &amp; Transaction Management System</p>
-        </div>
+    <div class="card">
+
+        <h1>
+            Photoline Inventory & Transaction Management System
+        </h1>
+
+        <p>
+            Dashboard
+        </p>
+
     </div>
 
-    <div class="grid three" style="margin-bottom:22px;">
-        <div class="card" style="margin:0;">
-            <h2>Transactions</h2>
-            <p style="color:var(--pl-muted);">Record and manage customer service transactions.</p>
-            <a href="{{ route('transactions.create') }}" class="btn">+ New Transaction</a>
-        </div>
+    <div class="card">
 
-        <div class="card" style="margin:0;">
-            <h2>Inventory Audits</h2>
-            <p style="color:var(--pl-muted);">Count physical stock against recorded quantities.</p>
-            <a href="{{ route('audits.create') }}" class="btn green">+ New Audit</a>
-        </div>
-
-        <div class="card" style="margin:0;">
-            <h2>Inventory</h2>
-            <p style="color:var(--pl-muted);">Add and update the items kept in the branch.</p>
-            <a href="{{ route('products.index') }}" class="btn orange">Manage Inventory</a>
-        </div>
-    </div>
-
-    <div class="card table-wrap">
-
-        <h2>Recent Transactions</h2>
+        <h2>
+            Recent Transactions
+        </h2>
 
         <table>
+
             <thead>
+
                 <tr>
                     <th>Control Number</th>
                     <th>Customer</th>
                     <th>Service</th>
                     <th>Status</th>
                 </tr>
+
             </thead>
+
             <tbody>
+
                 @forelse($transactions as $transaction)
+
                     <tr>
-                        <td>{{ $transaction->control_number }}</td>
-                        <td>{{ $transaction->customer_name }}</td>
-                        <td>{{ $transaction->service_type }}</td>
-                        <td>{{ $transaction->status }}</td>
+
+                        <td>
+                            {{ $transaction->control_number }}
+                        </td>
+
+                        <td>
+                            {{ $transaction->customer_name }}
+                        </td>
+
+                        <td>
+                            {{ $transaction->service_type }}
+                        </td>
+
+                        <td>
+                            {{ $transaction->status }}
+                        </td>
+
                     </tr>
+
                 @empty
-                    <tr><td colspan="4" class="empty">No transactions yet.</td></tr>
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            style="text-align:center;"
+                        >
+                            No transactions yet.
+                        </td>
+
+                    </tr>
+
                 @endforelse
+
             </tbody>
+
         </table>
 
     </div>
 
 </div>
-@endsection
+
+</x-staff-layout>

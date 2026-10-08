@@ -1,19 +1,27 @@
-@extends('layouts.panel')
-
-@section('title', 'Transaction Details')
+<x-manager-layout title="Transaction Details - Photoline Abreeza">
 
 @push('styles')
 <style>
+        .container {
+            width: 90%;
+            max-width: 1000px;
+
+            margin: 35px auto;
+        }
+
         .page-header {
             margin-bottom: 25px;
         }
+
         .page-header h1 {
             margin: 0 0 8px;
         }
+
         .page-header p {
             margin: 0;
             color: #6b7280;
         }
+
         .card {
             background: white;
 
@@ -25,9 +33,11 @@
 
             margin-bottom: 20px;
         }
+
         .card h2 {
             margin-top: 0;
         }
+
         .details {
             display: grid;
 
@@ -35,6 +45,7 @@
 
             gap: 18px;
         }
+
         .detail {
             padding: 15px;
 
@@ -42,6 +53,7 @@
 
             border-radius: 7px;
         }
+
         .detail-label {
             display: block;
 
@@ -51,11 +63,13 @@
 
             margin-bottom: 6px;
         }
+
         .detail-value {
             font-size: 16px;
 
             font-weight: bold;
         }
+
         .status {
             display: inline-block;
 
@@ -66,23 +80,28 @@
             font-size: 12px;
             font-weight: bold;
         }
+
         .status.pending {
             background: #fef3c7;
             color: #92400e;
         }
+
         .status.claimed {
             background: #d1fae5;
             color: #065f46;
         }
+
         .status.voided {
             background: #fee2e2;
             color: #991b1b;
         }
+
         .description {
             line-height: 1.6;
 
             white-space: pre-wrap;
         }
+
         .back-button {
             display: inline-block;
 
@@ -95,18 +114,16 @@
 
             border-radius: 6px;
         }
-        @media (max-width: 700px) {.details {
+
+        @media (max-width: 700px) {
+.details {
                 grid-template-columns: 1fr;
-            }}
-    
+            }
+        }
 </style>
 @endpush
 
-@section('content')
-    
-
-
-    <div class="container">
+<div class="container">
 
         <div class="page-header">
 
@@ -254,4 +271,5 @@
         </a>
 
     </div>
-@endsection
+
+</x-manager-layout>

@@ -3,11 +3,12 @@
 use App\Http\Controllers\InventoryAuditController;
 use App\Http\Controllers\ManagerAuditController;
 use App\Http\Controllers\ManagerTransactionController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReplenishmentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
+use App\Models\AuditDetail;
+use App\Models\InventoryAudit;
+use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Route;
 
@@ -32,7 +33,44 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
 
     if (auth()->user()->isManager()) {
-        return view('manager.dashboard');
+
+        $todayTransactions = Transaction::whereDate(
+            'created_at',
+            today()
+        )->count();
+
+        $pendingTransactions = Transaction::where(
+            'status',
+            'Pending'
+        )->count();
+
+        $totalAudits = InventoryAudit::count();
+
+        $discrepancies = AuditDetail::where(
+            'discrepancy',
+            '!=',
+            0
+        )->count();
+
+        $productCount = Product::count();
+
+        $recentTransactions = Transaction::latest()
+            ->take(5)
+            ->get();
+
+        $recentAudits = InventoryAudit::latest()
+            ->take(5)
+            ->get();
+
+        return view('manager.dashboard', compact(
+            'todayTransactions',
+            'pendingTransactions',
+            'totalAudits',
+            'discrepancies',
+            'productCount',
+            'recentTransactions',
+            'recentAudits'
+        ));
     }
 
     $transactions = Transaction::latest()
@@ -65,18 +103,6 @@ Route::middleware(['auth'])->group(function () {
         'transactions',
         TransactionController::class
     );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Inventory (CRUD) - staff and manager
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'products',
-        ProductController::class
-    )->except(['show']);
 
 
     /*
@@ -131,10 +157,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('manager.')
         ->group(function () {
 
-            /*
-            | Manager Transactions
-            */
-
             Route::get(
                 '/transactions',
                 [ManagerTransactionController::class, 'index']
@@ -144,11 +166,6 @@ Route::middleware(['auth'])->group(function () {
                 '/transactions/{transaction}',
                 [ManagerTransactionController::class, 'show']
             )->name('transactions.show');
-
-
-            /*
-            | Manager Audits
-            */
 
             Route::get(
                 '/audits',
@@ -193,7 +210,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get(
         '/replenishments',
-        [ReplenishmentController::class, 'index']
+        function () {
+            return 'Replenishments page';
+        }
     )->name('replenishments.index');
 
 

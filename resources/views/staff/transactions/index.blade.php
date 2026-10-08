@@ -1,17 +1,24 @@
-@extends('layouts.panel')
-
-@section('title', 'Transactions')
+<x-staff-layout title="Transactions">
 
 @push('styles')
 <style>
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+        }
+
         .top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        .button,
-        button {
+
+        .button, button {
             padding: 9px 14px;
             background: #222;
             color: white;
@@ -20,48 +27,54 @@
             text-decoration: none;
             cursor: pointer;
         }
+
         .search {
             margin-bottom: 25px;
         }
+
         .search input {
             width: 300px;
             padding: 9px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        th,
-        td {
+
+        th, td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
+
         th {
             background: #eee;
         }
+
         .actions a {
             margin-right: 10px;
         }
+
         .void-form {
             display: inline;
         }
+
         .success {
             background: #e2f5e9;
             border: 1px solid #9bd3ac;
             padding: 12px;
             margin-bottom: 20px;
         }
+
         .pagination {
             margin-top: 20px;
         }
-    
 </style>
 @endpush
 
-@section('content')
 <div class="container">
 
     <div class="top">
@@ -205,4 +218,5 @@
     </div>
 
 </div>
-@endsection
+
+</x-staff-layout>

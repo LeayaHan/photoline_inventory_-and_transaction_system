@@ -1,71 +1,105 @@
-@extends('layouts.panel')
+<x-staff-layout title="Inventory Audits">
 
-@section('title', 'Inventory Audits')
+@push('styles')
+<style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-@section('content')
-<div class="container">
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
 
-    <div class="page-header">
-        <div>
-            <h1>Inventory Audits</h1>
-            <p>Count physical stock and compare it against the recorded quantity.</p>
-        </div>
-        <a href="{{ route('audits.create') }}" class="btn">+ New Audit</a>
+        input, button {
+            padding: 8px;
+        }
+
+        .success {
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #e8f5e9;
+        }
+
+        .actions a {
+            margin-right: 10px;
+        }
+
+        .page-card {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+        }
+</style>
+@endpush
+
+<div class="page-card">
+
+<h1>Inventory Audits</h1>
+
+@if(session('success'))
+    <div class="success">
+        {{ session('success') }}
     </div>
+@endif
 
-    @if(session('success'))
-        <div class="success">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="error">{{ session('error') }}</div>
-    @endif
+<form method="GET" action="{{ route('audits.index') }}">
+    <input
+        type="text"
+        name="search"
+        value="{{ request('search') }}"
+        placeholder="Search date or auditor"
+    >
 
-    <form method="GET" action="{{ route('audits.index') }}" class="filter-bar">
-        <input type="text" name="search" value="{{ request('search') }}"
-               placeholder="Search by date (YYYY-MM-DD) or auditor">
-        <button type="submit" class="btn">Search</button>
-        @if(request('search'))
-            <a href="{{ route('audits.index') }}" class="btn gray">Clear</a>
-        @endif
-    </form>
+    <button type="submit">Search</button>
 
-    <div class="card table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Audit ID</th>
-                    <th>Audit Date</th>
-                    <th>Auditor</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($audits as $audit)
-                    <tr>
-                        <td>#{{ $audit->id }}</td>
-                        <td>{{ $audit->audit_date->format('Y-m-d') }}</td>
-                        <td>{{ $audit->user->name }}</td>
-                        <td>
-                            <span class="badge {{ $audit->status === 'Completed' ? 'green' : 'orange' }}">
-                                {{ $audit->status }}
-                            </span>
-                        </td>
-                        <td class="actions">
-                            <a href="{{ route('audits.show', $audit) }}">View</a>
-                            @if($audit->status === 'Ongoing')
-                                <a href="{{ route('audits.edit', $audit) }}">Edit</a>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="5" class="empty">No inventory audits found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+    <a href="{{ route('audits.create') }}">Create Audit</a>
+</form>
 
-        <div class="pagination">{{ $audits->links() }}</div>
-    </div>
+<table>
+    <thead>
+        <tr>
+            <th>Audit ID</th>
+            <th>Audit Date</th>
+            <th>Auditor</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @forelse($audits as $audit)
+            <tr>
+                <td>{{ $audit->id }}</td>
+                <td>{{ $audit->audit_date->format('Y-m-d') }}</td>
+                <td>{{ $audit->user->name }}</td>
+                <td>{{ $audit->status }}</td>
+                <td class="actions">
+                    <a href="{{ route('audits.show', $audit) }}">View</a>
+
+                    @if($audit->status === 'Ongoing')
+                        <a href="{{ route('audits.edit', $audit) }}">Edit</a>
+                    @endif
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5">No inventory audits found.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
+
+<br>
+
+{{ $audits->links() }}
 
 </div>
-@endsection
+
+</x-staff-layout>

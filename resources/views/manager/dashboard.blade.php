@@ -1,109 +1,329 @@
-@extends('layouts.panel')
-
-@section('title', 'Manager Dashboard')
+<x-manager-layout title="Manager Dashboard - Photoline Abreeza">
 
 @push('styles')
 <style>
-    .dash-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-bottom: 34px;
+    .dashboard {
+        width: 90%;
+        max-width: 1200px;
+        margin: 35px auto;
     }
-    .dash-head h1 { margin: 0 0 4px; font-size: 28px; line-height: 1.2; }
-    .dash-head p { margin: 0; color: var(--pl-muted); }
-    .dash-date { color: var(--pl-muted); font-size: 14px; }
 
-    .dash-section + .dash-section { margin-top: 34px; }
-    .dash-section h2 { margin: 0 0 4px; font-size: 18px; }
-    .dash-section > p { margin: 0 0 16px; color: var(--pl-muted); font-size: 14px; }
+    .dashboard-header {
+        margin-bottom: 25px;
+    }
 
-    .dash-grid {
+    .dashboard-header h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+        color: #111827;
+    }
+
+    .dashboard-header p {
+        margin: 0;
+        color: #6b7280;
+    }
+
+    .summary {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 18px;
+        margin-bottom: 22px;
     }
-    .dash-card {
-        display: flex;
-        flex-direction: column;
-        background: #fff;
-        border: 1px solid var(--pl-line);
-        border-radius: 10px;
-        padding: 22px;
-        transition: border-color .15s;
-    }
-    .dash-card:hover { border-color: #bfdbfe; }
-    .dash-card h3 { margin: 0 0 8px; font-size: 17px; }
-    .dash-card p { margin: 0 0 20px; color: var(--pl-muted); font-size: 14px; }
-    .dash-card .btn { margin-top: auto; align-self: flex-start; }
 
-    /* Each group has three cards, so go straight from three columns to one. */
-    @media (max-width: 760px) { .dash-grid { grid-template-columns: 1fr; } }
+    .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+
+    .card-label {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .card-value {
+        color: #111827;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .content {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 20px;
+    }
+
+    .panel {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+
+    .panel h2 {
+        margin: 0 0 15px;
+        font-size: 18px;
+        color: #111827;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 10px 8px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+    }
+
+    th {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    td {
+        color: #374151;
+    }
+
+    .status {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .empty {
+        color: #9ca3af;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .link {
+        display: inline-block;
+        margin-top: 15px;
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+        .summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .summary {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
-@section('content')
-<div class="container">
 
-    <div class="dash-head">
-        <div>
-            <h1>Manager Dashboard</h1>
-            <p>Branch management and operational oversight</p>
-        </div>
-        <div class="dash-date">{{ now()->format('l, j F Y') }}</div>
+<div class="dashboard">
+
+    <div class="dashboard-header">
+        <h1>Manager Dashboard</h1>
+        <p>Branch overview and operational status for Photoline Abreeza</p>
     </div>
 
-    <section class="dash-section">
-        <h2>Daily operations</h2>
-        <p>What happens at the counter and on the shelves.</p>
 
-        <div class="dash-grid">
-            <div class="dash-card">
-                <h3>Transactions</h3>
-                <p>Search and review customer service transaction records handled by branch staff.</p>
-                <a href="{{ route('manager.transactions.index') }}" class="btn">View transactions</a>
-            </div>
+    <div class="summary">
 
-            <div class="dash-card">
-                <h3>Inventory audits</h3>
-                <p>Review audit records, physical counts, POS quantities, and recorded discrepancies.</p>
-                <a href="{{ route('manager.audits.index') }}" class="btn">View audits</a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Replenishment</h3>
-                <p>Review branch replenishment requests and stock-related actions.</p>
-                <a href="{{ route('replenishments.index') }}" class="btn">View replenishments</a>
-            </div>
+        <div class="card">
+            <div class="card-label">Today's Transactions</div>
+            <div class="card-value">{{ $todayTransactions }}</div>
         </div>
-    </section>
 
-    <section class="dash-section">
-        <h2>Records and setup</h2>
-        <p>Summaries, the item list, and who can use the system.</p>
-
-        <div class="dash-grid">
-            <div class="dash-card">
-                <h3>Reports</h3>
-                <p>Review summarized transaction history and inventory discrepancy information.</p>
-                <a href="{{ route('reports.index') }}" class="btn gray">View reports</a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Inventory</h3>
-                <p>Add, update and remove the items that are counted in inventory audits.</p>
-                <a href="{{ route('products.index') }}" class="btn gray">Manage inventory</a>
-            </div>
-
-            <div class="dash-card">
-                <h3>Staff accounts</h3>
-                <p>Create, update, and manage staff accounts authorized to use the system.</p>
-                <a href="{{ route('users.index') }}" class="btn gray">Manage staff</a>
-            </div>
+        <div class="card">
+            <div class="card-label">Pending Transactions</div>
+            <div class="card-value">{{ $pendingTransactions }}</div>
         </div>
-    </section>
+
+        <div class="card">
+            <div class="card-label">Inventory Audits</div>
+            <div class="card-value">{{ $totalAudits }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Discrepancies</div>
+            <div class="card-value">{{ $discrepancies }}</div>
+        </div>
+
+    </div>
+
+
+    <div class="content">
+
+        <div class="panel">
+
+            <h2>Recent Transactions</h2>
+
+            @if($recentTransactions->count())
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach($recentTransactions as $transaction)
+                            <tr>
+                                <td>#{{ $transaction->id }}</td>
+
+                                <td>
+                                    {{ $transaction->customer_name ?? 'N/A' }}
+                                </td>
+
+                                <td class="status">
+                                    {{ $transaction->status ?? 'N/A' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            @else
+
+                <div class="empty">
+                    No transactions recorded yet.
+                </div>
+
+            @endif
+
+            <a
+                href="{{ route('manager.transactions.index') }}"
+                class="link"
+            >
+                View Transactions →
+            </a>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>Branch Overview</h2>
+
+            <table>
+                <tbody>
+
+                    <tr>
+                        <td>Products</td>
+                        <td>{{ $productCount }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Pending Transactions</td>
+                        <td>{{ $pendingTransactions }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Inventory Audits</td>
+                        <td>{{ $totalAudits }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Discrepancies</td>
+                        <td>{{ $discrepancies }}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <a
+                href="{{ route('reports.index') }}"
+                class="link"
+            >
+                View Reports →
+            </a>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>Recent Inventory Audits</h2>
+
+            @if($recentAudits->count())
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach($recentAudits as $audit)
+                            <tr>
+                                <td>#{{ $audit->id }}</td>
+
+                                <td class="status">
+                                    {{ $audit->status ?? 'N/A' }}
+                                </td>
+
+                                <td>
+                                    {{ $audit->created_at?->format('M d, Y') }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            @else
+
+                <div class="empty">
+                    No inventory audits recorded yet.
+                </div>
+
+            @endif
+
+            <a
+                href="{{ route('manager.audits.index') }}"
+                class="link"
+            >
+                View Audits →
+            </a>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>Reports</h2>
+
+            <p style="color:#6b7280; line-height:1.5;">
+                Review transaction and inventory audit information
+                for the branch.
+            </p>
+
+            <a
+                href="{{ route('reports.index') }}"
+                class="link"
+            >
+                Open Reports →
+            </a>
+
+        </div>
+
+    </div>
 
 </div>
-@endsection
+
+</x-manager-layout>

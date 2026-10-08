@@ -1,34 +1,43 @@
-@extends('layouts.panel')
-
-@section('title', 'New Transaction')
+<x-staff-layout title="Create Transaction">
 
 @push('styles')
 <style>
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+        }
+
         h1 {
             margin-bottom: 25px;
         }
+
         .form-group {
             margin-bottom: 18px;
         }
+
         label {
             display: block;
             font-weight: bold;
             margin-bottom: 6px;
         }
-        input,
-        textarea,
-        select {
+
+        input, textarea, select {
             width: 100%;
             box-sizing: border-box;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         textarea {
             min-height: 100px;
         }
-        button,
-        .button {
+
+        button, .button {
             display: inline-block;
             padding: 10px 16px;
             border: none;
@@ -38,21 +47,21 @@
             text-decoration: none;
             cursor: pointer;
         }
+
         .back {
             margin-left: 10px;
             background: #777;
         }
+
         .errors {
             background: #ffe5e5;
             border: 1px solid #ff9999;
             padding: 10px;
             margin-bottom: 20px;
         }
-    
 </style>
 @endpush
 
-@section('content')
 <div class="container">
 
     <h1>Create Customer Service Transaction</h1>
@@ -152,4 +161,5 @@
     </form>
 
 </div>
-@endsection
+
+</x-staff-layout>

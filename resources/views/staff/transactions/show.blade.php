@@ -1,17 +1,26 @@
-@extends('layouts.panel')
-
-@section('title', 'Transaction Details')
+<x-staff-layout title="Transaction Details">
 
 @push('styles')
 <style>
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+        }
+
         .row {
             display: flex;
             margin-bottom: 15px;
         }
+
         .label {
             width: 180px;
             font-weight: bold;
         }
+
         .button {
             display: inline-block;
             padding: 10px 15px;
@@ -21,20 +30,20 @@
             border-radius: 4px;
             margin-right: 8px;
         }
+
         .back {
             background: #777;
         }
+
         .success {
             background: #e2f5e9;
             border: 1px solid #9bd3ac;
             padding: 12px;
             margin-bottom: 20px;
         }
-    
 </style>
 @endpush
 
-@section('content')
 <div class="container">
 
     <h1>Transaction Details</h1>
@@ -138,4 +147,5 @@
     </div>
 
 </div>
-@endsection
+
+</x-staff-layout>
