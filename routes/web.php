@@ -1,274 +1,110 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\CustomerTransactionController;
 use App\Http\Controllers\InventoryAuditController;
-use App\Http\Controllers\ManagerAuditController;
-use App\Http\Controllers\ManagerInventoryController;
-use App\Http\Controllers\ManagerTransactionController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\UserController;
-use App\Models\AuditDetail;
-use App\Models\InventoryAudit;
-use App\Models\Product;
-use App\Models\Transaction;
+use App\Http\Controllers\InventoryRequestController;
+use App\Http\Controllers\BranchManagerReportController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StaffInventoryController;
+use App\Http\Controllers\StaffInventoryRequestController;
+use App\Http\Controllers\StaffController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-
-/*
-|--------------------------------------------------------------------------
-| Public
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Dashboard
-|--------------------------------------------------------------------------
-*/
-
+// Old Breeze "dashboard" URL: send each person to their own dashboard
 Route::get('/dashboard', function () {
-
-    if (auth()->user()->isManager()) {
-
-        $todayTransactions = Transaction::whereDate(
-            'created_at',
-            today()
-        )->count();
-
-        $pendingTransactions = Transaction::where(
-            'status',
-            'Pending'
-        )->count();
-
-        $totalAudits = InventoryAudit::count();
-
-        $discrepancies = AuditDetail::where(
-            'discrepancy',
-            '!=',
-            0
-        )->count();
-
-        $productCount = Product::count();
-
-        $recentTransactions = Transaction::latest()
-            ->take(5)
-            ->get();
-
-        $recentAudits = InventoryAudit::latest()
-            ->take(5)
-            ->get();
-
-        return view('manager.dashboard', compact(
-            'todayTransactions',
-            'pendingTransactions',
-            'totalAudits',
-            'discrepancies',
-            'productCount',
-            'recentTransactions',
-            'recentAudits'
-        ));
+    if (Auth::guard('staff')->check()) {
+        return redirect()->route('staff.dashboard');
     }
 
-    $transactions = Transaction::latest()
-        ->take(5)
-        ->get();
+    if (Auth::guard('web')->check()) {
+        return redirect()->route('branch-manager.dashboard');
+    }
 
-    $todayTransactions = Transaction::whereDate('created_at', today())->count();
-    $pendingTransactions = Transaction::where('status', 'Pending')->count();
-    $productCount = Product::count();
-    $ongoingAudits = InventoryAudit::where('status', 'Ongoing')->count();
+    return redirect()->route('login');
+})->name('dashboard');
 
-    return view(
-        'staff.dashboard',
-        compact(
-            'transactions',
-            'todayTransactions',
-            'pendingTransactions',
-            'productCount',
-            'ongoingAudits'
-        )
-    );
+Route::middleware('auth:web')
+    ->prefix('branch-manager')
+    ->name('branch-manager.')
+    ->group(function () {
 
-})->middleware(['auth'])->name('dashboard');
+        // Branch Manager Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'manager'])->name('dashboard');
 
+        // Branch Manager Reports (read-only summaries of this system's recorded data)
+        Route::get('reports', [BranchManagerReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/export', [BranchManagerReportController::class, 'export'])->name('reports.export');
+
+        // Staff Management
+        Route::resource('users', StaffController::class)->parameters(['users' => 'staff']);
+
+        // Inventory (manager only observes; changes come from approved staff requests)
+        Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
+
+        // Inventory audits (manager reviews drafts and finalized reports)
+        Route::get('audits', [InventoryAuditController::class, 'managerIndex'])->name('audits.index');
+        Route::get('audits/{audit}', [InventoryAuditController::class, 'managerShow'])->name('audits.show');
+
+        // Customer service transactions (manager review only)
+        Route::get('transactions', [CustomerTransactionController::class, 'managerIndex'])->name('transactions.index');
+        Route::get('transactions/{transaction}', [CustomerTransactionController::class, 'managerShow'])->name('transactions.show');
+
+        // Staff inventory requests (manager reviews)
+        Route::get('inventory-requests', [InventoryRequestController::class, 'index'])->name('inventory-requests.index');
+        Route::post('inventory-requests/{inventoryRequest}/approve', [InventoryRequestController::class, 'approve'])->name('inventory-requests.approve');
+        Route::post('inventory-requests/{inventoryRequest}/decline', [InventoryRequestController::class, 'decline'])->name('inventory-requests.decline');
+    });
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes
+| Staff area (own guard, own layout)
 |--------------------------------------------------------------------------
 */
+Route::middleware('auth:staff')
+    ->prefix('staff')
+    ->name('staff.')
+    ->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'staff'])->name('dashboard');
+        Route::get('/transactions', [CustomerTransactionController::class, 'staffIndex'])->name('transactions');
+        Route::get('/transactions/create', [CustomerTransactionController::class, 'create'])->name('transactions.create');
+        Route::post('/transactions', [CustomerTransactionController::class, 'store'])->name('transactions.store');
+        Route::post('/transactions/{transaction}/payments', [CustomerTransactionController::class, 'recordPayment'])->name('transactions.payments.store');
+        Route::get('/transactions/{transaction}', [CustomerTransactionController::class, 'show'])->name('transactions.show');
+        Route::get('/transactions/{transaction}/edit', [CustomerTransactionController::class, 'edit'])->name('transactions.edit');
+        Route::put('/transactions/{transaction}', [CustomerTransactionController::class, 'update'])->name('transactions.update');
+        Route::post('/transactions/{transaction}/complete', [CustomerTransactionController::class, 'complete'])->name('transactions.complete');
+        Route::post('/transactions/{transaction}/void', [CustomerTransactionController::class, 'void'])->name('transactions.void');
 
-Route::middleware(['auth'])->group(function () {
+        // Inventory: view + submit requests (manager approves)
+        Route::get('/inventory', [StaffInventoryController::class, 'index'])->name('inventory');
+        Route::get('/inventory/requests', [StaffInventoryRequestController::class, 'index'])->name('inventory.requests');
+        Route::get('/inventory/requests/create', [StaffInventoryRequestController::class, 'create'])->name('inventory.requests.create');
+        Route::post('/inventory/requests', [StaffInventoryRequestController::class, 'store'])->name('inventory.requests.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Staff Transactions
-    |--------------------------------------------------------------------------
-    */
+        Route::get('/audits', [InventoryAuditController::class, 'staffIndex'])->name('audits');
+        Route::get('/audits/create', [InventoryAuditController::class, 'create'])->name('audits.create');
+        Route::post('/audits', [InventoryAuditController::class, 'store'])->name('audits.store');
+        Route::get('/audits/{audit}', [InventoryAuditController::class, 'staffShow'])->name('audits.show');
+        Route::put('/audits/{audit}', [InventoryAuditController::class, 'update'])->name('audits.update');
+        Route::post('/audits/{audit}/finalize', [InventoryAuditController::class, 'finalize'])->name('audits.finalize');
+    });
 
-    Route::resource(
-        'transactions',
-        TransactionController::class
-    );
+Route::middleware('auth:web')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-    Route::patch(
-        '/transactions/{transaction}/claim',
-        [TransactionController::class, 'claim']
-    )->name('transactions.claim');
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Staff Inventory Items
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'inventory',
-        ProductController::class
-    )->except(['show']);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Staff Inventory Audits
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/audits',
-        [InventoryAuditController::class, 'index']
-    )->name('audits.index');
-
-    Route::get(
-        '/audits/create',
-        [InventoryAuditController::class, 'create']
-    )->name('audits.create');
-
-    Route::post(
-        '/audits',
-        [InventoryAuditController::class, 'store']
-    )->name('audits.store');
-
-    Route::get(
-        '/audits/{audit}',
-        [InventoryAuditController::class, 'show']
-    )->name('audits.show');
-
-    Route::get(
-        '/audits/{audit}/edit',
-        [InventoryAuditController::class, 'edit']
-    )->name('audits.edit');
-
-    Route::put(
-        '/audits/{audit}',
-        [InventoryAuditController::class, 'update']
-    )->name('audits.update');
-
-    Route::put(
-        '/audits/{audit}/complete',
-        [InventoryAuditController::class, 'complete']
-    )->name('audits.complete');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Manager Review
-    |--------------------------------------------------------------------------
-    */
-
-    Route::prefix('manager')
-        ->name('manager.')
-        ->group(function () {
-
-            Route::get(
-                '/transactions',
-                [ManagerTransactionController::class, 'index']
-            )->name('transactions.index');
-
-            Route::get(
-                '/transactions/{transaction}',
-                [ManagerTransactionController::class, 'show']
-            )->name('transactions.show');
-
-            Route::get(
-                '/inventory',
-                [ManagerInventoryController::class, 'index']
-            )->name('inventory.index');
-
-            Route::get(
-                '/audits',
-                [ManagerAuditController::class, 'index']
-            )->name('audits.index');
-
-            Route::get(
-                '/audits/{audit}',
-                [ManagerAuditController::class, 'show']
-            )->name('audits.show');
-
-        });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Manager Reports
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/reports',
-        [ReportController::class, 'index']
-    )->name('reports.index');
-
-    Route::get(
-        '/reports/transactions/export',
-        [ReportController::class, 'exportTransactions']
-    )->name('reports.transactions.export');
-
-    Route::get(
-        '/reports/audits/export',
-        [ReportController::class, 'exportAudits']
-    )->name('reports.audits.export');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Replenishments
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/replenishments',
-        function () {
-            return 'Replenishments page';
-        }
-    )->name('replenishments.index');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Staff Account Management
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'users',
-        UserController::class
-    )->except(['show']);
-
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
-
-
-/*
-|--------------------------------------------------------------------------
-| Authentication
-|--------------------------------------------------------------------------
-*/
 
 require __DIR__.'/auth.php';

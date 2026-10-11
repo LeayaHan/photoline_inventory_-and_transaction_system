@@ -1,119 +1,156 @@
-<x-staff-layout title="Transaction Details | Photoline">
+<x-staff-layout title="Transaction Details">
+    <link rel="stylesheet" href="{{ asset('css/transactions.css') }}">
 
-@push('styles')
-<style>
-    .details-page { width:min(900px,calc(100% - 36px)); margin:0 auto; padding:34px 0 55px; }
-    .details-card { overflow:hidden; border:1px solid #e5eaf2; border-radius:16px; background:#fff; box-shadow:0 10px 30px rgba(20,45,80,.05); }
-    .details-head { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; padding:26px 28px; border-bottom:1px solid #edf0f5; }
-    .details-head small { color:#ed2b24; font-size:10px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; }
-    .details-head h1 { margin:6px 0 5px; color:#0b2d5c; font-size:27px; letter-spacing:-.6px; }
-    .details-head p { margin:0; color:#68738a; font-size:12px; }
-    .status { display:inline-flex; align-items:center; justify-content:center; min-width:68px; padding:6px 10px; border-radius:999px; font-size:10px; font-weight:800; }
-    .status.pending { color:#1769e8; background:#eaf2ff; }
-    .status.claimed { color:#20754a; background:#eaf8f0; }
-    .status.voided { color:#b52a25; background:#fff0ef; }
-    .notice { margin:18px 28px 0; padding:12px 14px; border-radius:9px; font-size:12px; }
-    .notice.success { color:#206c43; background:#ebf8f0; border:1px solid #ccebd9; }
-    .notice.error { color:#a72520; background:#fff0ef; border:1px solid #f5cecb; }
-    .detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; padding:8px 28px; }
-    .detail-item { padding:18px 0; border-bottom:1px solid #edf0f5; }
-    .detail-item:nth-last-child(-n+2) { border-bottom:0; }
-    .detail-label { margin-bottom:6px; color:#7b8799; font-size:10px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
-    .detail-value { color:#172b4d; font-size:13px; font-weight:600; overflow-wrap:anywhere; }
-    .detail-value.control { color:#1769e8; font-weight:800; }
-    .detail-description { grid-column:1 / -1; }
-    .actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:20px 28px 26px; }
-    .action-btn { display:inline-flex; align-items:center; justify-content:center; min-width:78px; height:38px; padding:0 13px; border:1px solid transparent; border-radius:8px; text-decoration:none; font-size:12px; font-weight:800; cursor:pointer; }
-    .action-btn.primary { color:#fff; background:#1769e8; }
-    .action-btn.neutral { color:#536078; background:#eef3f9; }
-    .action-btn.claim { color:#20754a; background:#ebf8f0; border-color:#ccebd9; }
-    .action-btn.void { color:#b52a25; background:#fff0ef; border-color:#f3cfcc; }
-    .actions form { margin:0; }
-    .locked-note { margin-right:auto; color:#7b8799; font-size:11px; }
-    @media(max-width:700px) {
-        .details-head { flex-direction:column; }
-        .detail-grid { grid-template-columns:1fr; }
-        .detail-item:nth-last-child(-n+2) { border-bottom:1px solid #edf0f5; }
-        .detail-item:last-child { border-bottom:0; }
-        .detail-description { grid-column:auto; }
-    }
-</style>
-@endpush
-
-<div class="details-page">
-    <div class="details-card">
-        <div class="details-head">
-            <div>
-                <small>Staff Operations</small>
-                <h1>Transaction Details</h1>
-                <p>Review the transaction record and available workflow actions.</p>
-            </div>
-            <span class="status {{ strtolower($transaction->status) }}">{{ $transaction->status }}</span>
+    <div class="transaction-show">
+    <div class="staffui-pagehead transaction-pagehead">
+        <div>
+            <h1>Transaction Details</h1>
+            <p>
+                Control number: <strong>{{ $transaction->control_number }}</strong>
+                &nbsp;<span class="transaction-status transaction-status-{{ strtolower($transaction->status) }}">{{ $transaction->status }}</span>
+            </p>
         </div>
 
-        @if(session('success'))
-            <div class="notice success">{{ session('success') }}</div>
-        @endif
-
-        @if(session('error'))
-            <div class="notice error">{{ session('error') }}</div>
-        @endif
-
-        <div class="detail-grid">
-            <div class="detail-item">
-                <div class="detail-label">Control Number</div>
-                <div class="detail-value control">{{ $transaction->control_number }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Transaction Date</div>
-                <div class="detail-value">{{ $transaction->transaction_date->format('M d, Y') }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Customer Name</div>
-                <div class="detail-value">{{ $transaction->customer_name }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Service Type</div>
-                <div class="detail-value">{{ $transaction->service_type }}</div>
-            </div>
-            <div class="detail-item detail-description">
-                <div class="detail-label">Item / Service Description</div>
-                <div class="detail-value">{{ $transaction->item_description ?: 'No description provided.' }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Recorded By</div>
-                <div class="detail-value">{{ $transaction->creator?->name ?? 'Unknown' }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Created</div>
-                <div class="detail-value">{{ $transaction->created_at?->format('M d, Y h:i A') }}</div>
-            </div>
-        </div>
-
-        <div class="actions">
-            <a href="{{ route('transactions.index') }}" class="action-btn neutral">Back</a>
-
-            @if($transaction->status === 'Pending')
-                <a href="{{ route('transactions.edit', $transaction) }}" class="action-btn primary">Edit</a>
-
-                <form method="POST" action="{{ route('transactions.claim', $transaction) }}">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="action-btn claim">Claim</button>
-                </form>
-
-                <form method="POST" action="{{ route('transactions.destroy', $transaction) }}" onsubmit="return confirm('Void this pending transaction?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="action-btn void">Void</button>
-                </form>
-            @else
-                <span class="locked-note">
-                    {{ $transaction->status === 'Claimed' ? 'Claimed transactions are locked.' : 'Voided transactions are locked.' }}
-                </span>
+        <div class="transaction-pagehead-actions">
+            @if ($transaction->isEditable())
+                <a class="staffui-btn staffui-btn-outline" href="{{ route('staff.transactions.edit', $transaction) }}">Edit Transaction</a>
             @endif
+            <a class="staffui-btn staffui-btn-outline" href="{{ route('staff.transactions') }}">Back to Transactions</a>
         </div>
     </div>
-</div>
 
+    @if (session('success'))
+        <div class="staffui-alert staffui-alert-success">{{ session('success') }}</div>
+    @endif
+    @if ($errors->any())
+        <div class="transaction-errors"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+    @endif
+
+    <section class="transaction-form-card">
+        <div class="transaction-form-section-head"><h2>Customer Information</h2></div>
+
+        <div class="transaction-info-grid">
+            <div><span>Customer Name</span><strong>{{ $transaction->customer_name }}</strong></div>
+            <div><span>Contact Number</span><strong>{{ $transaction->customer_contact_number ?: '—' }}</strong></div>
+            <div><span>Address</span><strong>{{ $transaction->customer_address ?: '—' }}</strong></div>
+            <div><span>Transaction Date</span><strong>{{ $transaction->transaction_date->format('F d, Y') }}</strong></div>
+            <div><span>Recorded By</span><strong>{{ $transaction->staff?->full_name ?? 'Former staff' }}</strong></div>
+            @if ($transaction->void_reason)
+                <div class="transaction-info-wide"><span>Void Reason</span><strong>{{ $transaction->void_reason }}</strong></div>
+            @endif
+        </div>
+    </section>
+
+    <section class="transaction-form-card">
+        <div class="transaction-form-section-head"><h2>Items and Services</h2></div>
+
+        <div class="transaction-table-wrap">
+            <table class="staffui-table">
+                <thead><tr><th>Item / Service</th><th>Size / Layout</th><th>Notes</th><th>Qty</th><th>Unit Price</th><th>Line Total</th></tr></thead>
+                <tbody>
+                    @foreach ($transaction->details as $detail)
+                        <tr>
+                            <td>{{ $detail->service_type }}</td>
+                            <td>{{ $detail->service_size ?: '—' }}@if ($detail->print_layout) / {{ $detail->print_layout }}@endif</td>
+                            <td>{{ $detail->order_notes ?: $detail->description ?: '—' }}</td>
+                            <td>{{ $detail->quantity }}</td>
+                            <td>₱{{ number_format((float) $detail->amount, 2) }}</td>
+                            <td>₱{{ number_format($detail->quantity * (float) $detail->amount, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {{-- Payment history on the left. Summary and "record payment" on the right. --}}
+    <div class="transaction-payments-row">
+        <section class="transaction-form-card">
+            <div class="transaction-form-section-head"><h2>Payment History</h2></div>
+
+            <div class="transaction-table-wrap">
+                <table class="staffui-table">
+                    <thead><tr><th>Payment Date</th><th>Method</th><th>Recorded By</th><th>Amount</th></tr></thead>
+                    <tbody>
+                        @forelse ($transaction->payments as $payment)
+                            <tr>
+                                <td>{{ $payment->paid_at->format('M d, Y h:i A') }}</td>
+                                <td>{{ $payment->payment_type }}</td>
+                                <td>{{ $payment->staff?->full_name ?? 'Former staff' }}</td>
+                                <td>₱{{ number_format((float) $payment->amount, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4">No payments recorded yet.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="transaction-form-card">
+            <div class="transaction-form-section-head"><h2>Payment Summary</h2></div>
+
+            @include('transactions._payment-summary')
+
+            {{-- another payment can be added any time while there is a balance --}}
+            @if ($transaction->status !== 'Voided' && $transaction->balance > 0)
+                <form method="POST" action="{{ route('staff.transactions.payments.store', $transaction) }}" class="transaction-record-payment">
+                    @csrf
+                    <h3>Record Payment</h3>
+
+                    <label class="transaction-field">Amount (₱)
+                        <input type="number" name="amount" min="0.01" max="{{ number_format($transaction->balance, 2, '.', '') }}" step="0.01" required value="{{ old('amount') }}">
+                    </label>
+
+                    <label class="transaction-field">Payment Method
+                        <select name="payment_type" required>
+                            @foreach (\App\Models\TransactionPayment::METHODS as $method)
+                                <option value="{{ $method }}" @selected(old('payment_type') === $method)>{{ $method }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+
+                    <label class="transaction-field">Payment Date
+                        <input type="datetime-local" name="paid_at" required value="{{ old('paid_at', now()->format('Y-m-d\TH:i')) }}">
+                    </label>
+
+                    <button class="staffui-btn" type="submit">Record Payment</button>
+                </form>
+            @endif
+        </section>
+    </div>
+
+    {{-- A pending transaction can be completed or voided. Completed and voided ones are final. --}}
+    @if ($transaction->status === 'Pending')
+        <section class="transaction-action-grid">
+            <div class="transaction-action-card">
+                <h2>Complete Transaction</h2>
+
+                @if ($transaction->balance > 0)
+                    {{-- not fully paid yet, so it can't be completed --}}
+                    <p>This transaction still has a balance of <strong>₱{{ number_format($transaction->balance, 2) }}</strong>. Record the remaining payment first. It can only be completed once it is fully paid.</p>
+                    <button class="staffui-btn" type="button" disabled>Mark as Completed</button>
+                @else
+                    <p>Marks this transaction as completed and deducts the merchandise and configured raw materials from inventory. Completed transactions can no longer be edited.</p>
+                    <form method="POST" action="{{ route('staff.transactions.complete', $transaction) }}" onsubmit="return confirm('Complete this transaction? Inventory will be deducted and it can no longer be edited.')">
+                        @csrf
+                        <button class="staffui-btn" type="submit">Mark as Completed</button>
+                    </form>
+                @endif
+            </div>
+
+            <div class="transaction-action-card transaction-void-card">
+                <h2>Void Transaction</h2>
+                <p>Use this when the transaction should no longer be processed. Voided records remain in transaction history.</p>
+                <form method="POST" action="{{ route('staff.transactions.void', $transaction) }}" onsubmit="return confirm('Void this transaction? This action cannot be undone.');">
+                    @csrf
+                    <label class="transaction-field">Reason for Voiding <span>*</span>
+                        <input type="text" name="void_reason" maxlength="255" required value="{{ old('void_reason') }}" placeholder="Enter a reason">
+                    </label>
+                    <button class="transaction-danger-button" type="submit">Void Transaction</button>
+                </form>
+            </div>
+        </section>
+    @endif
+    </div>
 </x-staff-layout>

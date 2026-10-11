@@ -1,0 +1,175 @@
+/* ========================================
+   BRANCH MANAGER REPORTS
+   Screen styles reuse users.css cards/tables/buttons.
+   The @media print block at the bottom is a separate layout
+   for paper, not the screen UI squeezed onto a page.
+======================================== */
+
+.report-page { max-width: 1280px; }
+
+/* ---------- Switch + date range ---------- */
+.report-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; }
+.report-dates { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.report-dates label { display: flex; align-items: center; gap: 8px; color: #334155; font-size: 13px; font-weight: 600; }
+.report-dates input { height: 40px; padding: 0 10px; border: 1px solid #d9e2ee; border-radius: 7px; background: #fff; color: #24344d; font: inherit; font-size: 13px; }
+.report-dates .users-btn { min-height: 40px; }
+
+.report-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.report-filter { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 18px; }
+
+/* Quick date buttons: same look as the switch, smaller */
+.report-presets { display: inline-flex; gap: 3px; padding: 3px; border-radius: 9px; background: #eaeff7; }
+.report-preset { padding: 7px 13px; border-radius: 7px; color: #52627a; font-size: 12.5px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.report-preset:hover { color: #172b4d; }
+.report-preset.is-on { background: #fff; color: #215ecb; box-shadow: 0 1px 3px rgba(15, 35, 70, .15); }
+
+/* "N requests waiting" shortcut on the Replenishment tab */
+.report-callout { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 12px 16px; border: 1px solid #f3d9a4; border-radius: 10px; background: #fff8e6; color: #7a4b00; font-size: 13px; font-weight: 600; }
+
+/* ---------- Print-only heading (hidden on screen) ---------- */
+.report-sheet-head { display: none; }
+
+/* ---------- Content ---------- */
+.report-caption { margin: 24px 0 10px; color: #334155; font-size: 14px; font-weight: 700; }
+.report-caption.report-caption-first { margin-top: 0; }
+.report-note { margin: 8px 2px 0; color: #718096; font-size: 12px; line-height: 1.5; }
+.report-empty { margin: 0; padding: 18px 20px; border: 1px dashed #d9e2ee; border-radius: 10px; background: #fff; color: #718096; font-size: 13px; }
+
+/* ---------- Tables ---------- */
+.report-table .num, .report-table th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.report-table td { padding-top: 13px; padding-bottom: 13px; }
+.report-link { color: #1e3a8a; font-weight: 600; text-decoration: none; }
+.report-link:hover { text-decoration: underline; }
+.report-sub { color: #718096; font-size: 12px; font-weight: 500; }
+
+/* Totals row at the bottom of a table */
+.report-table tfoot td { padding-top: 13px; padding-bottom: 13px; border-top: 2px solid #cbd5e1; background: #f8fafc; color: #172b4d; font-weight: 700; }
+.report-table tfoot tr + tr td { border-top: 0; }
+.report-table tfoot .report-foot-minor td { color: #64748b; font-weight: 500; }
+
+.report-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; align-items: start; }
+
+/* Stock flags: always a text label, colour is only a hint */
+.report-flag { display: inline-block; margin: 1px 4px 1px 0; padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.report-flag-critical { color: #b91c1c; background: #fee2e2; }
+.report-flag-warn { color: #9a5b00; background: #fff3d6; }
+
+@media (max-width: 900px) {
+    .report-pair { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+    .report-page { padding: 24px 16px; }
+    .inv-switch { display: flex; width: 100%; overflow-x: auto; }
+    .inv-switch-btn { padding: 9px 14px; white-space: nowrap; }
+    .report-dates { width: 100%; }
+}
+
+/* ========================================
+   PRINT — A4 portrait, black on white, no app chrome
+======================================== */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 14mm 12mm 16mm;
+
+        @bottom-left { content: "Photoline Inventory & Transaction System"; font: 7.5pt sans-serif; color: #555; }
+        @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 7.5pt sans-serif; color: #555; }
+    }
+
+    /* Remove the app shell: sidebar, top bar, footer, form controls, links to other pages */
+    .photoline-sidebar,
+    .photoline-topbar,
+    .photoline-page-heading,
+    .photoline-footer,
+    .report-screen-only { display: none !important; }
+
+    .photoline-layout { display: block !important; }
+    .photoline-main { width: 100% !important; margin: 0 !important; min-height: 0 !important; }
+    .photoline-page-content { padding: 0 !important; }
+
+    html, body { background: #fff !important; }
+
+    .report-page {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: #111;
+        font-family: "Figtree", Arial, sans-serif;
+        font-size: 9pt;
+        line-height: 1.35;
+    }
+
+    /* Report heading */
+    .report-sheet-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 12mm;
+        margin: 0 0 7mm;
+        padding: 0 0 3mm;
+        border-bottom: 1.5pt solid #111;
+    }
+    .report-sheet-org { margin: 0 0 1mm; color: #444; font-size: 8pt; font-weight: 600; }
+    .report-sheet-head h1 { margin: 0; color: #000; font-size: 18pt; font-weight: 700; line-height: 1.15; }
+    .report-sheet-basis { margin: 1.5mm 0 0; max-width: 105mm; color: #555; font-size: 7.5pt; }
+    .report-sheet-head dl { margin: 0; }
+    .report-sheet-head dl > div { display: flex; justify-content: flex-end; gap: 3mm; font-size: 8pt; }
+    .report-sheet-head dt { color: #555; }
+    .report-sheet-head dd { margin: 0; min-width: 38mm; color: #000; font-weight: 600; text-align: right; }
+
+    /* Captions never sit alone at the bottom of a page */
+    .report-caption { margin: 4mm 0 1.5mm; color: #000; font-size: 9pt; break-after: avoid; page-break-after: avoid; }
+    .report-note { margin: 1.5mm 0 0; color: #555; font-size: 7.5pt; }
+    .report-empty { padding: 2mm 0; border: 0; background: none; color: #444; font-size: 8.5pt; }
+
+    /* Two small tables side by side stay together */
+    .report-pair { grid-template-columns: 1fr 1fr; gap: 0 6mm; break-inside: avoid; page-break-inside: avoid; }
+
+    /* Tables: plain ruled rows, header repeats on every page, rows never split */
+    .report-page .users-card {
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: none !important;
+        box-shadow: none !important;
+    }
+    .report-page .report-table { width: 100%; border-collapse: collapse; }
+    .report-page .report-table thead { display: table-header-group; background: none; }
+    .report-page .report-table tr { break-inside: avoid; page-break-inside: avoid; }
+    .report-page .report-table th {
+        padding: 1.2mm 1.6mm;
+        border-bottom: 1pt solid #000;
+        color: #000;
+        font-size: 7.5pt;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: none;
+        white-space: normal;
+    }
+    .report-page .report-table td {
+        padding: 1.2mm 1.6mm;
+        border-bottom: .5pt solid #bbb;
+        color: #111;
+        font-size: 8.5pt;
+    }
+    .report-page .report-table tbody tr:hover { background: none; }
+    .report-page .report-table tbody tr:last-child td { border-bottom: .5pt solid #777; }
+    .report-page .report-table tfoot td { padding: 1.2mm 1.6mm; border-top: 1pt solid #000; border-bottom: 0; background: none; color: #000; font-size: 8.5pt; font-weight: 700; }
+    .report-page .report-table tfoot tr + tr td { border-top: 0; }
+    .report-page .report-table tfoot .report-foot-minor td { font-weight: 400; }
+    .report-page .report-table tfoot { display: table-footer-group; }
+    .report-sub { color: #000; font-size: 7.5pt; }
+
+    /* Flags print as outlined text, readable without colour */
+    .report-flag {
+        padding: .2mm 1.4mm;
+        border: .5pt solid #333;
+        border-radius: 1mm;
+        background: none !important;
+        color: #000 !important;
+        font-size: 7.5pt;
+    }
+    .report-flag-critical { border-width: 1pt; font-weight: 700; }
+
+    a { color: inherit !important; text-decoration: none !important; }
+}

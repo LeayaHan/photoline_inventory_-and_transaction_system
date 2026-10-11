@@ -1,0 +1,415 @@
+:root {
+    --st-blue: #1769e8;
+    --st-blue-dark: #104bb5;
+    --st-red: #ed2b24;
+    --st-ink: #172033;
+    --st-muted: #68738a;
+    --st-bg: #f4f7fc;
+    --st-border: #e3e9f2;
+}
+
+* { box-sizing: border-box; }
+
+.staffui-body {
+    margin: 0;
+    font-family: "Figtree", sans-serif;
+    color: var(--st-ink);
+    background: var(--st-bg);
+}
+
+.staffui-shell { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.staffui-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    width: 255px;
+    height: 100vh;
+    padding: 28px 18px 18px;
+    overflow-y: auto;
+    color: #fff;
+    background: linear-gradient(180deg, #155cc9 0%, #1047a5 100%);
+}
+
+.staffui-brand {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px 26px;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, .17);
+}
+
+.staffui-brand-name { font-size: 28px; font-weight: 800; letter-spacing: 1px; }
+.staffui-brand-name span, .staffui-crumb-brand span { color: #ffb7b3; }
+
+.staffui-brand-tag {
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--st-red);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+}
+
+.staffui-menu-label {
+    margin: 28px 12px 12px;
+    color: #b9d4ff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.staffui-menu { display: flex; flex-direction: column; gap: 7px; }
+
+.staffui-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 46px;
+    padding: 12px;
+    border-radius: 9px;
+    color: #e9f1ff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background .2s ease, color .2s ease;
+}
+
+.staffui-link:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+
+.staffui-link.is-active {
+    color: var(--st-blue-dark);
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(4, 35, 91, .13);
+}
+
+.staffui-link.is-active::before {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: -18px;
+    width: 4px;
+    border-radius: 0 5px 5px 0;
+    background: var(--st-red);
+    content: "";
+}
+
+.staffui-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.staffui-sidebar-bottom { margin-top: auto; padding-top: 24px; }
+
+.staffui-account {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 15px 10px;
+    border-top: 1px solid rgba(255, 255, 255, .17);
+}
+
+.staffui-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: var(--st-blue-dark);
+    background: #fff;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.staffui-account-info { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+
+.staffui-account-name {
+    overflow: hidden;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.staffui-account-role { color: #c9ddff; font-size: 10px; }
+
+.staffui-logout {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.staffui-logout:hover { background: rgba(237, 43, 36, .2); }
+
+/* Main */
+.staffui-main {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 255px);
+    min-height: 100vh;
+    margin-left: 255px;
+}
+
+.staffui-topbar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 76px;
+    padding: 0 34px;
+    border-bottom: 1px solid var(--st-border);
+    background: #fff;
+}
+
+.staffui-crumbs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.staffui-crumb-brand { color: var(--st-blue); font-size: 12px; font-weight: 800; letter-spacing: .8px; }
+.staffui-crumb-brand span { color: var(--st-red); }
+.staffui-crumb-sep { color: #c2cad7; }
+
+.staffui-topbar-user { margin-left: auto; }
+
+.staffui-staffid {
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: var(--st-blue-dark);
+    background: #e8f0fd;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.staffui-toggle {
+    display: none;
+    border: 0;
+    color: var(--st-blue-dark);
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.staffui-content { flex: 1; padding: 28px 34px; }
+
+.staffui-welcome h1 { margin: 0 0 6px; font-size: 24px; font-weight: 800; }
+.staffui-welcome p { margin: 0 0 26px; color: var(--st-muted); font-size: 14px; }
+
+.staffui-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.staffui-card {
+    display: block;
+    padding: 24px;
+    border: 1px solid var(--st-border);
+    border-radius: 12px;
+    color: inherit;
+    background: #fff;
+    text-decoration: none;
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.staffui-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 75, 181, .1); }
+
+.staffui-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    color: var(--st-blue-dark);
+    background: #e8f0fd;
+    font-size: 22px;
+}
+
+.staffui-card h3 { margin: 0 0 8px; font-size: 17px; }
+.staffui-card p { margin: 0 0 16px; color: var(--st-muted); font-size: 13px; line-height: 1.6; }
+
+.staffui-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: #9a5b00;
+    background: #fff3d6;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.staffui-empty {
+    max-width: 520px;
+    padding: 40px 30px;
+    border: 1px solid var(--st-border);
+    border-radius: 12px;
+    background: #fff;
+    text-align: center;
+}
+
+.staffui-empty h3 { margin: 0 0 8px; }
+.staffui-empty p { margin: 0 0 20px; color: var(--st-muted); font-size: 14px; }
+
+.staffui-btn {
+    display: inline-block;
+    padding: 11px 18px;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--st-blue);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.staffui-btn:hover { background: var(--st-blue-dark); }
+
+.staffui-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 34px;
+    border-top: 1px solid var(--st-border);
+    color: var(--st-muted);
+    background: #fff;
+    font-size: 11px;
+}
+
+@media (max-width: 900px) {
+    .staffui-sidebar { transform: translateX(-100%); transition: transform .25s ease; }
+    .staffui-sidebar.is-open { transform: translateX(0); box-shadow: 12px 0 35px rgba(10, 32, 70, .2); }
+    .staffui-main { width: 100%; margin-left: 0; }
+    .staffui-toggle { display: inline-flex; }
+    .staffui-topbar { padding: 0 22px; }
+    .staffui-content { padding: 22px; }
+    .staffui-cards { grid-template-columns: 1fr; }
+    .staffui-footer { padding: 18px 22px; }
+}
+
+/* ===== Inventory (staff) ===== */
+.staffui-pagehead { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; }
+.staffui-pagehead h1 { margin: 0 0 6px; font-size: 24px; font-weight: 800; }
+.staffui-pagehead p { margin: 0; color: var(--st-muted); font-size: 14px; }
+
+.staffui-btn-outline { color: var(--st-blue-dark); background: #fff; border: 1px solid #c9d8f3; }
+.staffui-btn-outline:hover { background: #e8f0fd; }
+.staffui-btn-sm { padding: 7px 11px; font-size: 12px; border-radius: 7px; }
+.staffui-btn-danger { color: #b91c1c; background: #fff; border: 1px solid #fca5a5; }
+.staffui-btn-danger:hover { background: #fee2e2; }
+button.staffui-btn { border: 0; font-family: inherit; cursor: pointer; }
+button.staffui-btn.staffui-btn-outline { border: 1px solid #c9d8f3; }
+
+.staffui-alert { margin-bottom: 18px; padding: 13px 16px; border-radius: 9px; font-size: 13px; font-weight: 600; }
+.staffui-alert-success { color: #166534; background: #dcfce7; border: 1px solid #bbf7d0; }
+.staffui-alert-error { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; }
+.staffui-alert ul { margin: 0; padding-left: 18px; }
+
+.staffui-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.staffui-filters input, .staffui-filters select {
+    height: 42px; padding: 0 13px; border: 1px solid var(--st-border); border-radius: 8px;
+    background: #fff; color: var(--st-ink); font-family: inherit; font-size: 13px;
+}
+.staffui-filters input[type="text"] { flex: 1; min-width: 200px; }
+.staffui-filters input:focus, .staffui-filters select:focus { border-color: var(--st-blue); outline: none; box-shadow: 0 0 0 3px rgba(23,105,232,.1); }
+
+.staffui-tablecard { overflow-x: auto; border: 1px solid var(--st-border); border-radius: 12px; background: #fff; }
+.staffui-table { width: 100%; border-collapse: collapse; text-align: left; }
+.staffui-table th {
+    padding: 14px 16px; border-bottom: 1px solid var(--st-border); background: #f8faff;
+    color: #52627a; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap;
+}
+.staffui-table td { padding: 14px 16px; border-bottom: 1px solid #edf1f6; font-size: 13px; vertical-align: middle; }
+.staffui-table tbody tr:last-child td { border-bottom: 0; }
+.staffui-table tbody tr:hover { background: #fafcff; }
+.staffui-table .staffui-rowactions { display: flex; flex-wrap: wrap; gap: 6px; }
+.staffui-code { color: #52627a; font-size: 12px; font-weight: 600; }
+.staffui-emptyrow { padding: 34px 16px !important; color: var(--st-muted); text-align: center; }
+
+.staffui-pill { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.staffui-pill-ok, .staffui-pill-approved { color: #166534; background: #dcfce7; }
+.staffui-pill-low, .staffui-pill-pending { color: #9a5b00; background: #fff3d6; }
+.staffui-pill-out, .staffui-pill-declined { color: #b91c1c; background: #fee2e2; }
+
+.staffui-pager { margin-top: 18px; }
+
+.staffui-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.staffui-tab { padding: 8px 15px; border: 1px solid var(--st-border); border-radius: 8px; background: #fff; color: #52627a; font-size: 13px; font-weight: 600; text-decoration: none; }
+.staffui-tab:hover { background: #f4f7fc; }
+.staffui-tab.is-active { color: #fff; background: var(--st-blue); border-color: var(--st-blue); }
+
+/* Request cards */
+.staffui-reqlist { display: flex; flex-direction: column; gap: 14px; }
+.staffui-req { padding: 20px 22px; border: 1px solid var(--st-border); border-radius: 12px; background: #fff; }
+.staffui-req-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.staffui-req-type { color: var(--st-blue); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.staffui-req h3 { margin: 3px 0 0; font-size: 17px; }
+.staffui-req-meta { margin-top: 4px; color: var(--st-muted); font-size: 12px; }
+.staffui-req-lines { margin: 0 0 12px; padding: 12px 14px; border-radius: 8px; background: #f8faff; list-style: none; }
+.staffui-req-lines li { display: flex; gap: 10px; padding: 3px 0; font-size: 13px; }
+.staffui-req-lines li strong { flex: 0 0 120px; color: #52627a; font-weight: 600; }
+.staffui-req-note { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
+.staffui-req-review { padding-top: 12px; border-top: 1px solid #edf1f6; color: #52627a; font-size: 13px; }
+.staffui-req-review.is-declined { color: #b91c1c; }
+
+/* Form */
+.staffui-formcard { max-width: 820px; padding: 28px; border: 1px solid var(--st-border); border-radius: 12px; background: #fff; }
+.staffui-itembox { margin-bottom: 22px; padding: 14px 16px; border-radius: 9px; background: #e8f0fd; color: var(--st-blue-dark); font-size: 13px; }
+.staffui-itembox strong { display: block; margin-bottom: 2px; font-size: 15px; }
+.staffui-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
+.staffui-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.staffui-field.is-wide { grid-column: 1 / -1; }
+.staffui-field label { font-size: 13px; font-weight: 600; }
+.staffui-field label span { color: var(--st-red); }
+.staffui-field input, .staffui-field select, .staffui-field textarea {
+    width: 100%; padding: 0 13px; border: 1px solid #d9e2ee; border-radius: 8px; background: #f9fbfe;
+    color: var(--st-ink); font-family: inherit; font-size: 14px;
+}
+.staffui-field input, .staffui-field select { height: 46px; }
+.staffui-field textarea { min-height: 90px; padding: 12px 13px; resize: vertical; }
+.staffui-field input:focus, .staffui-field select:focus, .staffui-field textarea:focus {
+    border-color: var(--st-blue); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(23,105,232,.1);
+}
+.staffui-formactions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.staffui-note { margin: 0 0 20px; color: var(--st-muted); font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 700px) {
+    .staffui-grid { grid-template-columns: 1fr; }
+    .staffui-req-lines li { flex-direction: column; gap: 2px; }
+}
+
+
+.staffui-nav-group { width: 100%; }
+.staffui-nav-group > summary { list-style: none; cursor: pointer; }
+.staffui-nav-group > summary::-webkit-details-marker { display: none; }
+.staffui-nav-chevron { margin-left: auto; font-size: 12px; transition: transform .15s ease; }
+.staffui-nav-group[open] > summary .staffui-nav-chevron { transform: rotate(180deg); }
+.staffui-submenu { display: grid; gap: 4px; padding: 4px 0 8px 42px; }
+.staffui-sub-link { display: block; padding: 9px 12px; border-radius: 8px; color: inherit; text-decoration: none; font-size: 13px; opacity: .82; }
+.staffui-sub-link:hover, .staffui-sub-link.is-active { opacity: 1; background: rgba(255,255,255,.10); }

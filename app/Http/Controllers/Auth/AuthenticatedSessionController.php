@@ -28,7 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $home = Auth::guard('staff')->check()
+            ? route('staff.dashboard', absolute: false)
+            : route('branch-manager.dashboard', absolute: false);
+
+        return redirect()->intended($home);
     }
 
     /**
@@ -37,6 +41,7 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
+        Auth::guard('staff')->logout();
 
         $request->session()->invalidate();
 

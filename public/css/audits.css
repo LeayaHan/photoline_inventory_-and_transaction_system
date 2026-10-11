@@ -1,0 +1,372 @@
+/* ========================================
+   Audit Page Header
+======================================== */
+
+.audit-pagehead {
+    align-items: center;
+}
+
+.audit-pagehead p,
+.audit-manager-page .users-pagehead p {
+    margin-top: 5px;
+    color: #6b7280;
+}
+
+
+/* ========================================
+   Audit Summary Cards
+======================================== */
+
+.audit-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.audit-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.audit-summary span,
+.audit-details-grid span {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.audit-summary strong {
+    color: #111827;
+    font-size: 25px;
+    line-height: 1.2;
+}
+
+
+/* ========================================
+   Audit Filters
+======================================== */
+
+.audit-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.audit-filters label,
+.audit-field {
+    display: flex;
+    flex: 1 1 150px;
+    flex-direction: column;
+    gap: 6px;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.audit-filters input,
+.audit-field input,
+.audit-field textarea,
+.audit-count-input,
+.audit-remark-input {
+    width: 100%;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    color: #111827;
+    font: inherit;
+}
+
+.audit-filters select {
+    width: 100%;
+    min-width: 140px;
+    padding: 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    color: #111827;
+    font: inherit;
+}
+
+.audit-manager-page .audit-filters input {
+    min-width: 140px;
+}
+
+.audit-clear {
+    padding: 9px 4px;
+    color: #4b5563;
+    text-decoration: underline;
+    font-size: 13px;
+}
+
+.audit-clear.staffui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 9px 16px;
+    border: 1px solid #dc2626;
+    border-radius: 7px;
+    background: #dc2626;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.audit-clear.staffui-btn:hover {
+    border-color: #b91c1c;
+    background: #b91c1c;
+    color: #fff;
+}
+
+
+/* ========================================
+   Audit Forms
+======================================== */
+
+.audit-form-card {
+    margin: 18px 0;
+    padding: 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.audit-field {
+    max-width: 480px;
+    margin-bottom: 14px;
+}
+
+.audit-field:last-child {
+    margin-bottom: 0;
+}
+
+.audit-form-actions,
+.audit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* ========================================
+   Section Headings
+======================================== */
+
+.audit-section-heading h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.audit-section-heading p {
+    margin: 5px 0 15px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* ========================================
+   Audit Tables
+======================================== */
+
+.audit-table-wrap {
+    overflow-x: auto;
+}
+
+.audit-count-table {
+    min-width: 850px;
+}
+
+.audit-count-input {
+    max-width: 125px;
+}
+
+.audit-remark-input {
+    min-width: 150px;
+}
+
+.audit-subtext {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 11px;
+}
+
+
+/* ========================================
+   Validation Errors
+======================================== */
+
+.audit-errors {
+    margin: 16px 0;
+    padding: 14px 16px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.audit-errors ul {
+    margin: 8px 0 0 20px;
+    list-style: disc;
+}
+
+
+/* ========================================
+   Audit Details
+======================================== */
+
+.audit-details-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.audit-details-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.audit-details-grid strong {
+    color: #111827;
+    font-size: 15px;
+}
+
+.audit-full-width {
+    grid-column: 1 / -1;
+}
+
+.audit-full-width p {
+    margin: 0;
+    color: #374151;
+}
+
+
+/* ========================================
+   Audit Status Badges
+======================================== */
+
+.audit-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.audit-status-shortage {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.audit-status-excess {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.audit-status-matched {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.audit-status-draft,
+.audit-status-in_progress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.audit-status-finalized {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+
+/* ========================================
+   Read-Only Notice
+======================================== */
+
+.audit-readonly-note {
+    margin: 14px 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* ========================================
+   Responsive Layout
+======================================== */
+
+@media (max-width: 900px) {
+    .audit-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .audit-details-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .audit-summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .audit-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .audit-full-width {
+        grid-column: auto;
+    }
+}
+
+
+/* ========================================
+   Print Styles
+======================================== */
+
+@media print {
+    .staffui-sidebar,
+    .staffui-topbar,
+    .staffui-footer,
+    .audit-actions,
+    .users-pagehead .audit-actions,
+    .audit-filters,
+    .audit-summary-grid,
+    .staffui-pagehead a,
+    .staffui-pagehead button,
+    #audit-update-form + div {
+        display: none !important;
+    }
+
+    body {
+        background: #fff !important;
+    }
+
+    .audit-form-card,
+    .users-card {
+        break-inside: avoid;
+        box-shadow: none !important;
+    }
+}

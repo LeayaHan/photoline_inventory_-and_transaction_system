@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -11,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Already-signed-in people who open /login go to their own dashboard
+        $middleware->redirectUsersTo(function () {
+            return Auth::guard('staff')->check()
+                ? route('staff.dashboard')
+                : route('branch-manager.dashboard');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

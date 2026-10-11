@@ -1,0 +1,364 @@
+
+:root {
+    --photo-blue: #1769e8;
+    --photo-blue-dark: #104bb5;
+    --photo-red: #ed2b24;
+    --photo-sidebar: #124eb5;
+    --photo-ink: #172033;
+    --photo-muted: #68738a;
+    --photo-background: #f4f7fc;
+    --photo-border: #e3e9f2;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Figtree", sans-serif;
+    color: var(--photo-ink);
+    background: var(--photo-background);
+}
+
+.photoline-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.photoline-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    width: 255px;
+    height: 100vh;
+    padding: 28px 18px 18px;
+    overflow-y: auto;
+    color: #fff;
+    background: linear-gradient(180deg, #155cc9 0%, #1047a5 100%);
+}
+
+.photoline-brand {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px 28px;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, .17);
+}
+
+.photoline-brand-name {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.photoline-brand-name span,
+.photoline-topbar-kicker span {
+    color: #ffb7b3;
+}
+
+.photoline-brand-subtitle {
+    margin-top: 5px;
+    font-size: 10px;
+    letter-spacing: .35px;
+    color: #d5e5ff;
+}
+
+.photoline-menu-label {
+    margin: 28px 12px 12px;
+    color: #b9d4ff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.photoline-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.photoline-nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 46px;
+    padding: 12px;
+    border: 0;
+    border-radius: 9px;
+    color: #e9f1ff;
+    background: transparent;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background .2s ease, color .2s ease;
+}
+
+.photoline-nav-link:not(.photoline-nav-disabled):hover {
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+}
+
+.photoline-nav-link.active {
+    color: var(--photo-blue-dark);
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(4, 35, 91, .13);
+}
+
+.photoline-nav-link.active::before {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: -18px;
+    width: 4px;
+    border-radius: 0 5px 5px 0;
+    background: var(--photo-red);
+    content: "";
+}
+
+.photoline-nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.photoline-nav-disabled {
+    cursor: not-allowed;
+    opacity: .66;
+}
+
+.photoline-nav-soon {
+    margin-left: auto;
+    padding: 3px 6px;
+    border-radius: 5px;
+    color: #e2ecff;
+    background: rgba(255, 255, 255, .12);
+    font-size: 9px;
+}
+
+.photoline-nav-badge {
+    margin-left: auto;
+    min-width: 20px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    color: #fff;
+    background: var(--photo-red);
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.photoline-nav-link.active .photoline-nav-badge { color: #fff; }
+
+.photoline-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+.photoline-account {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 15px 10px;
+    border-top: 1px solid rgba(255, 255, 255, .17);
+}
+
+.photoline-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: var(--photo-blue-dark);
+    background: #fff;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.photoline-account-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+}
+
+.photoline-account-name {
+    overflow: hidden;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.photoline-account-role {
+    color: #c9ddff;
+    font-size: 10px;
+}
+
+.photoline-logout {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.photoline-logout:hover {
+    background: rgba(237, 43, 36, .2);
+}
+
+.photoline-main {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 255px);
+    min-height: 100vh;
+    margin-left: 255px;
+}
+
+.photoline-topbar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 76px;
+    padding: 0 34px;
+    border-bottom: 1px solid var(--photo-border);
+    background: #fff;
+}
+
+.photoline-topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--photo-ink);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.photoline-topbar-kicker {
+    color: var(--photo-blue);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .8px;
+}
+
+.photoline-topbar-kicker span {
+    color: var(--photo-red);
+}
+
+.photoline-topbar-divider {
+    color: #c2cad7;
+}
+
+.photoline-menu-toggle {
+    display: none;
+    border: 0;
+    color: var(--photo-blue-dark);
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.photoline-page-heading {
+    padding: 24px 34px 0;
+    color: var(--photo-ink);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.photoline-page-content {
+    flex: 1;
+    padding: 28px 34px;
+}
+
+.photoline-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 34px;
+    border-top: 1px solid var(--photo-border);
+    color: var(--photo-muted);
+    background: #fff;
+    font-size: 11px;
+}
+
+@media (max-width: 900px) {
+    .photoline-sidebar {
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+    }
+
+    .photoline-sidebar.sidebar-open {
+        transform: translateX(0);
+        box-shadow: 12px 0 35px rgba(10, 32, 70, .2);
+    }
+
+    .photoline-main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .photoline-menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .photoline-topbar {
+        padding: 0 22px;
+    }
+
+    .photoline-page-heading {
+        padding: 22px 22px 0;
+    }
+
+    .photoline-page-content {
+        padding: 22px;
+    }
+
+    .photoline-footer {
+        padding: 18px 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .photoline-topbar {
+        min-height: 64px;
+        padding: 0 15px;
+    }
+
+    .photoline-topbar-title {
+        gap: 7px;
+        font-size: 11px;
+    }
+
+    .photoline-page-content {
+        padding: 16px;
+    }
+
+    .photoline-page-heading {
+        padding: 20px 16px 0;
+        font-size: 19px;
+    }
+
+    .photoline-footer {
+        padding: 15px 16px;
+    }
+}

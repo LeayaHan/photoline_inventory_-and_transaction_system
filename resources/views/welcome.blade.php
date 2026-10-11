@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -7,7 +8,9 @@
     <title>Photoline | Inventory & Transaction System</title>
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         :root {
             --blue: #1769e8;
@@ -140,9 +143,9 @@
 
         .feature {
             padding: 9px 13px;
-            border: 1px solid rgba(255,255,255,.20);
+            border: 1px solid rgba(255, 255, 255, .20);
             border-radius: 999px;
-            background: rgba(255,255,255,.09);
+            background: rgba(255, 255, 255, .09);
             font-size: 13px;
             font-weight: 600;
             color: #fff;

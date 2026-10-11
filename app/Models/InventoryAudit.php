@@ -3,28 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InventoryAudit extends Model
 {
     protected $fillable = [
-        'user_id',
+        'audit_number',
         'audit_date',
+        'auditor_name',
+        'auditor_role',
+        'staff_id',
         'status',
+        'remarks',
+        'finalized_at',
+        'finalized_by',
     ];
 
-    protected $casts = [
-        'audit_date' => 'date',
-    ];
-
-    public function user(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(User::class);
+        return [
+            'audit_date' => 'date',
+            'finalized_at' => 'datetime',
+        ];
     }
 
-    public function details(): HasMany
+    public function items(): HasMany
     {
-        return $this->hasMany(AuditDetail::class);
+        return $this->hasMany(InventoryAuditItem::class);
+    }
+
+    public function isFinalized(): bool
+    {
+        return $this->status === 'finalized';
     }
 }

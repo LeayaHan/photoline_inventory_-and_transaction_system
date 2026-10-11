@@ -1,33 +1,30 @@
 <x-guest-layout>
-
     <div class="photoline-login-heading">
-        <p class="photoline-login-kicker">Welcome</p>
+        <p class="photoline-login-kicker">WELCOME BACK</p>
 
         <h2>Sign in to Photoline</h2>
 
-        <p>
-            Enter your account details to continue to your workspace.
-        </p>
+        <p>Enter your account details to continue to your workspace.</p>
     </div>
 
     <x-auth-session-status
-        class="mb-4 photoline-status"
+        class="photoline-status"
         :status="session('status')"
     />
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <div>
+        <div class="photoline-form-group">
             <x-input-label
                 for="email"
-                :value="__('Email')"
+                :value="__('Email address')"
                 class="photoline-field-label"
             />
 
             <x-text-input
                 id="email"
-                class="block photoline-field"
+                class="block w-full photoline-field"
                 type="email"
                 name="email"
                 :value="old('email')"
@@ -39,11 +36,11 @@
 
             <x-input-error
                 :messages="$errors->get('email')"
-                class="mt-2"
+                class="photoline-error"
             />
         </div>
 
-        <div class="mt-5">
+        <div class="photoline-form-group photoline-password-group">
             <x-input-label
                 for="password"
                 :value="__('Password')"
@@ -52,7 +49,7 @@
 
             <x-text-input
                 id="password"
-                class="block photoline-field"
+                class="block w-full photoline-field"
                 type="password"
                 name="password"
                 required
@@ -62,42 +59,39 @@
 
             <x-input-error
                 :messages="$errors->get('password')"
-                class="mt-2"
+                class="photoline-error"
             />
         </div>
-        <br>
-        <div class="flex items-center justify-between mt-5">
-            <label
-                for="remember_me"
-                class="inline-flex items-center photoline-check"
-            >
+
+        <div class="photoline-login-options">
+            <label for="remember_me" class="photoline-check">
                 <input
                     id="remember_me"
                     type="checkbox"
-                    class="rounded border-gray-300 shadow-sm focus:ring-blue-500"
                     name="remember"
+                    value="1"
                 >
 
-                <span class="ms-2 text-sm">
-                    {{ __('Remember me') }}
-                </span>
+                <span>Remember me</span>
             </label>
 
             @if (Route::has('password.request'))
                 <a
-                    class="text-sm underline rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 photoline-forgot"
                     href="{{ route('password.request') }}"
+                    class="photoline-forgot"
                 >
-                    {{ __('Forgot password?') }}
+                    Forgot password?
                 </a>
             @endif
         </div>
-        <br>
-        <div class="mt-7">
-            <x-primary-button class="w-full justify-center photoline-login-button">
-                {{ __('Log in') }}
-            </x-primary-button>
+
+        <button type="submit" class="photoline-login-button">
+            LOG IN
+        </button>
+
+        <div class="photoline-login-footer">
+            <span>PHOTOLINE</span>
+            <span>Inventory and Transaction Management System</span>
         </div>
     </form>
-
 </x-guest-layout>

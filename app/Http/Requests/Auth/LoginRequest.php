@@ -42,7 +42,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+        $remember = $this->boolean('remember');
+
+        // 1) Branch manager account (users table)
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            Auth::guard('staff')->logout();
+        }
+        // 2) Staff account (staff table)
+        elseif (Auth::guard('staff')->attempt($credentials, $remember)) {
+            Auth::guard('web')->logout();
+        } else {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
