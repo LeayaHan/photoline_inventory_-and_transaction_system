@@ -6,7 +6,6 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Add Staff</h1>
-                <p class="users-subtitle">Create a new staff account for your branch.</p>
             </div>
 
             <a href="{{ route('branch-manager.users.index') }}"

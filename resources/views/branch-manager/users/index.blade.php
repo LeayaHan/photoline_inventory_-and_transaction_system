@@ -66,7 +66,7 @@
                                     <form
                                         action="{{ route('branch-manager.users.destroy', ['staff' => $member->id]) }}"
                                         method="POST"
-                                        onsubmit="return confirm('Delete this staff account?')"
+                                        data-confirm="Delete this staff account?" data-confirm-title="Delete staff account" data-confirm-ok="Delete"
                                     >
                                         @csrf
                                         @method('DELETE')

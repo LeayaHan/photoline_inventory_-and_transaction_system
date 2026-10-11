@@ -2,7 +2,6 @@
     <div class="staffui-pagehead">
         <div>
             <h1>Create Inventory Audit</h1>
-            <p>Create the audit once, then enter counts, save changes, and finalize it when finished.</p>
         </div>
         <a class="staffui-btn staffui-btn-outline" href="{{ route('staff.audits') }}">Back to Audits</a>
     </div>

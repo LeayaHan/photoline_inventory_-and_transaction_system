@@ -36,6 +36,10 @@ class InventoryItem extends Model
         'raw_material' => 'Cost per Unit',
     ];
 
+    // Units an item can be counted in. Pick the unit you buy and store the item in
+    // (packs of paper, bottles of ink, single cameras), so audits stay quick and clear.
+    public const UNITS = ['pcs', 'packs', 'boxes', 'bottles', 'rolls', 'sets', 'pairs'];
+
     // Item codes look like MER-000001 or RAW-000001
     public const CODE_PREFIXES = [
         'merchandise' => 'MER',

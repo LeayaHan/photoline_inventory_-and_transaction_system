@@ -26,12 +26,19 @@
 
         <div class="staff-field">
             <label for="unit">Unit </label>
-            <input
-                id="unit"
-                type="text"
-                name="unit"
-                value="{{ old('unit', $item?->unit ?? 'pcs') }}"
-                placeholder="pcs, packs, bottles..." required>
+            @php
+                $currentUnit = old('unit', $item?->unit ?? 'pcs');
+                $unitOptions = \App\Models\InventoryItem::UNITS;
+                // an older item with its own spelling keeps working until someone changes it
+                if (! in_array($currentUnit, $unitOptions, true)) {
+                    $unitOptions[] = $currentUnit;
+                }
+            @endphp
+            <select id="unit" name="unit" required>
+                @foreach ($unitOptions as $unit)
+                    <option value="{{ $unit }}" {{ $currentUnit === $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div class="staff-field">

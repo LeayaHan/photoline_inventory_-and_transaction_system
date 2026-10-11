@@ -2,7 +2,6 @@
     <div class="staffui-pagehead">
         <div>
             <h1>My Inventory Requests</h1>
-            <p>Track the changes you've sent to the branch manager.</p>
         </div>
 
         <div style="display:flex; gap:8px; flex-wrap:wrap;">

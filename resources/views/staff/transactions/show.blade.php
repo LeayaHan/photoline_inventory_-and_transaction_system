@@ -38,6 +38,10 @@
             @if ($transaction->void_reason)
                 <div class="transaction-info-wide"><span>Void Reason</span><strong>{{ $transaction->void_reason }}</strong></div>
             @endif
+            @if ($transaction->voided_at)
+                <div><span>Voided By</span><strong>{{ $transaction->voidedBy?->full_name ?? 'Former staff' }}</strong></div>
+                <div><span>Voided On</span><strong>{{ $transaction->voided_at->format('M d, Y h:i A') }}</strong></div>
+            @endif
         </div>
     </section>
 
@@ -63,94 +67,115 @@
         </div>
     </section>
 
-    {{-- Payment history on the left. Summary and "record payment" on the right. --}}
-    <div class="transaction-payments-row">
-        <section class="transaction-form-card">
-            <div class="transaction-form-section-head"><h2>Payment History</h2></div>
+    {{-- Left: payment history and what staff can do. Right: money summary and "record payment". --}}
+    <div class="transaction-detail-layout">
+        <div class="transaction-detail-main">
+            <section class="transaction-form-card">
+                <div class="transaction-form-section-head"><h2>Payment History</h2></div>
 
-            <div class="transaction-table-wrap">
-                <table class="staffui-table">
-                    <thead><tr><th>Payment Date</th><th>Method</th><th>Recorded By</th><th>Amount</th></tr></thead>
-                    <tbody>
-                        @forelse ($transaction->payments as $payment)
-                            <tr>
-                                <td>{{ $payment->paid_at->format('M d, Y h:i A') }}</td>
-                                <td>{{ $payment->payment_type }}</td>
-                                <td>{{ $payment->staff?->full_name ?? 'Former staff' }}</td>
-                                <td>₱{{ number_format((float) $payment->amount, 2) }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="4">No payments recorded yet.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                <div class="transaction-table-wrap">
+                    <table class="staffui-table">
+                        <thead><tr><th>Payment Date</th><th>Method</th><th>Recorded By</th><th>Amount</th></tr></thead>
+                        <tbody>
+                            @forelse ($transaction->payments as $payment)
+                                <tr>
+                                    <td>{{ $payment->paid_at->format('M d, Y h:i A') }}</td>
+                                    <td>{{ $payment->payment_type }}</td>
+                                    <td>{{ $payment->staff?->full_name ?? 'Former staff' }}</td>
+                                    <td>₱{{ number_format((float) $payment->amount, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4">No payments recorded yet.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-        <section class="transaction-form-card">
-            <div class="transaction-form-section-head"><h2>Payment Summary</h2></div>
+            {{-- A pending transaction can be completed or voided. A completed one can still be voided. Voided ones are final. --}}
+            @if ($transaction->isVoidable())
+                @php
+                    $voidWarning = $transaction->status === 'Completed'
+                        ? 'Void this completed transaction? The stock used for it will be put back into inventory. This action cannot be undone.'
+                        : 'Void this transaction? This action cannot be undone.';
+                @endphp
 
-            @include('transactions._payment-summary')
+                @if ($transaction->status === 'Pending')
+                    <section class="transaction-action-card">
+                        <h2>Complete Transaction</h2>
+
+                        @if ($transaction->balance > 0)
+                            {{-- the balance itself is already shown in the summary on the right --}}
+                            <p>Available once the balance is fully paid.</p>
+                            <button class="staffui-btn" type="button" disabled>Mark as Completed</button>
+                        @else
+                            <p>Deducts the used stock from inventory. A completed transaction can no longer be edited.</p>
+                            <form method="POST" action="{{ route('staff.transactions.complete', $transaction) }}" data-confirm="Complete this transaction? Inventory will be deducted and it can no longer be edited." data-confirm-title="Complete transaction" data-confirm-ok="Complete">
+                                @csrf
+                                <button class="staffui-btn" type="submit">Mark as Completed</button>
+                            </form>
+                        @endif
+                    </section>
+                @endif
+
+                <section class="transaction-action-card transaction-void-card">
+                    <h2>Void Transaction</h2>
+                    <p>
+                        @if ($transaction->status === 'Completed')
+                            The stock used for this transaction goes back to inventory.
+                        @endif
+                        @if ($transaction->amount_paid > 0)
+                            Payments stay in the history, so refund the customer if needed.
+                        @endif
+                        @if ($transaction->status !== 'Completed' && $transaction->amount_paid <= 0)
+                            A reason is required. This cannot be undone.
+                        @endif
+                    </p>
+
+                    <form method="POST" action="{{ route('staff.transactions.void', $transaction) }}" class="transaction-void-row" data-confirm="{{ $voidWarning }}" data-confirm-title="Void transaction" data-confirm-ok="Void">
+                        @csrf
+                        <input type="text" name="void_reason" maxlength="255" required value="{{ old('void_reason') }}" placeholder="Reason for voiding (required)" aria-label="Reason for voiding">
+                        <button class="transaction-danger-button" type="submit">Void Transaction</button>
+                    </form>
+                </section>
+            @endif
+        </div>
+
+        <aside class="transaction-detail-side">
+            <section class="transaction-form-card">
+                <div class="transaction-form-section-head"><h2>Payment Summary</h2></div>
+                @include('transactions._payment-summary')
+            </section>
 
             {{-- another payment can be added any time while there is a balance --}}
             @if ($transaction->status !== 'Voided' && $transaction->balance > 0)
-                <form method="POST" action="{{ route('staff.transactions.payments.store', $transaction) }}" class="transaction-record-payment">
-                    @csrf
-                    <h3>Record Payment</h3>
+                <section class="transaction-form-card">
+                    <div class="transaction-form-section-head"><h2>Record Payment</h2></div>
 
-                    <label class="transaction-field">Amount (₱)
-                        <input type="number" name="amount" min="0.01" max="{{ number_format($transaction->balance, 2, '.', '') }}" step="0.01" required value="{{ old('amount') }}">
-                    </label>
-
-                    <label class="transaction-field">Payment Method
-                        <select name="payment_type" required>
-                            @foreach (\App\Models\TransactionPayment::METHODS as $method)
-                                <option value="{{ $method }}" @selected(old('payment_type') === $method)>{{ $method }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-
-                    <label class="transaction-field">Payment Date
-                        <input type="datetime-local" name="paid_at" required value="{{ old('paid_at', now()->format('Y-m-d\TH:i')) }}">
-                    </label>
-
-                    <button class="staffui-btn" type="submit">Record Payment</button>
-                </form>
-            @endif
-        </section>
-    </div>
-
-    {{-- A pending transaction can be completed or voided. Completed and voided ones are final. --}}
-    @if ($transaction->status === 'Pending')
-        <section class="transaction-action-grid">
-            <div class="transaction-action-card">
-                <h2>Complete Transaction</h2>
-
-                @if ($transaction->balance > 0)
-                    {{-- not fully paid yet, so it can't be completed --}}
-                    <p>This transaction still has a balance of <strong>₱{{ number_format($transaction->balance, 2) }}</strong>. Record the remaining payment first. It can only be completed once it is fully paid.</p>
-                    <button class="staffui-btn" type="button" disabled>Mark as Completed</button>
-                @else
-                    <p>Marks this transaction as completed and deducts the merchandise and configured raw materials from inventory. Completed transactions can no longer be edited.</p>
-                    <form method="POST" action="{{ route('staff.transactions.complete', $transaction) }}" onsubmit="return confirm('Complete this transaction? Inventory will be deducted and it can no longer be edited.')">
+                    <form method="POST" action="{{ route('staff.transactions.payments.store', $transaction) }}" class="transaction-record-payment">
                         @csrf
-                        <button class="staffui-btn" type="submit">Mark as Completed</button>
-                    </form>
-                @endif
-            </div>
 
-            <div class="transaction-action-card transaction-void-card">
-                <h2>Void Transaction</h2>
-                <p>Use this when the transaction should no longer be processed. Voided records remain in transaction history.</p>
-                <form method="POST" action="{{ route('staff.transactions.void', $transaction) }}" onsubmit="return confirm('Void this transaction? This action cannot be undone.');">
-                    @csrf
-                    <label class="transaction-field">Reason for Voiding <span>*</span>
-                        <input type="text" name="void_reason" maxlength="255" required value="{{ old('void_reason') }}" placeholder="Enter a reason">
-                    </label>
-                    <button class="transaction-danger-button" type="submit">Void Transaction</button>
-                </form>
-            </div>
-        </section>
-    @endif
+                        <label class="transaction-field">Amount (₱)
+                            <input type="number" name="amount" min="0.01" max="{{ number_format($transaction->balance, 2, '.', '') }}" step="0.01" required value="{{ old('amount') }}">
+                        </label>
+
+                        <label class="transaction-field">Payment Method
+                            <select name="payment_type" required>
+                                @foreach (\App\Models\TransactionPayment::METHODS as $method)
+                                    <option value="{{ $method }}" @selected(old('payment_type') === $method)>{{ $method }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <label class="transaction-field">Payment Date
+                            <input type="datetime-local" name="paid_at" required value="{{ old('paid_at', now()->format('Y-m-d\TH:i')) }}">
+                        </label>
+
+                        <button class="staffui-btn" type="submit">Record Payment</button>
+                    </form>
+                </section>
+            @endif
+        </aside>
+    </div>
     </div>
 </x-staff-layout>

@@ -6,7 +6,6 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Customer Transactions</h1>
-                <p class="users-subtitle">Review and retrieve customer service transaction history.</p>
             </div>
         </div>
 
@@ -49,7 +48,7 @@
                             <td>₱{{ number_format($transaction->balance, 2) }}</td>
                             <td><span class="payment-status {{ $transaction->payment_status_class }}">{{ $transaction->payment_status }}</span></td>
                             <td><span class="transaction-status transaction-status-{{ strtolower($transaction->status) }}">{{ $transaction->status }}</span></td>
-                            <td><a class="users-btn users-btn-secondary" href="{{ route('branch-manager.transactions.show', $transaction) }}">View Details</a></td>
+                            <td><a class="users-btn users-btn-primary" href="{{ route('branch-manager.transactions.show', $transaction) }}">View Details</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="9" class="users-empty">No transactions found.</td></tr>

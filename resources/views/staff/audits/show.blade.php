@@ -61,7 +61,7 @@
     <div class="audit-form-actions" style="margin-top:16px">
             @if (! $audit->isFinalized())
                 <button class="staffui-btn staffui-btn-outline" type="submit" form="audit-update-form">Save</button>
-                <form id="finalize-audit-form" method="POST" action="{{ route('staff.audits.finalize', $audit) }}">
+                <form id="finalize-audit-form" method="POST" action="{{ route('staff.audits.finalize', $audit) }}" data-confirm="Finalize this audit? It will become read-only." data-confirm-title="Finalize audit" data-confirm-ok="Finalize">
                     @csrf
                     <button class="staffui-btn" type="submit">Finalize Audit</button>
                 </form>
@@ -77,10 +77,6 @@
             event.preventDefault();
             alert('Please enter a physical count for every inventory item before finalizing this audit.');
             return;
-        }
-
-        if (!confirm('Finalize this audit? It will become read-only.')) {
-            event.preventDefault();
         }
     });
 </script>

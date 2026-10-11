@@ -6,9 +6,6 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Inventory Audits</h1>
-                <p class="users-subtitle">
-                    Review saved drafts and finalized inventory audit reports.
-                </p>
             </div>
         </div>
 
@@ -88,7 +85,7 @@
             </label>
 
             <button
-                class="users-btn users-btn-secondary"
+                class="users-btn users-btn-primary"
                 type="submit"
             >
                 Filter
@@ -142,7 +139,7 @@
 
                             <td>
                                 <a
-                                    class="users-btn users-btn-secondary"
+                                    class="users-btn users-btn-primary"
                                     href="{{ route('branch-manager.audits.show', $audit) }}"
                                 >
                                     View Audit

@@ -71,8 +71,7 @@
     font: inherit;
 }
 
-.transaction-clear,
-.transaction-manager-clear {
+.transaction-clear {
     display: inline-flex;
     align-items: center;
     min-height: 40px;
@@ -80,6 +79,30 @@
     color: #4b5563;
     font-size: 13px;
     text-decoration: underline;
+}
+
+/* Manager Clear button: red, same shade as the staff Audit Records page */
+.transaction-manager-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid #dc2626;
+    border-radius: 7px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.transaction-manager-clear:hover {
+    border-color: #b91c1c;
+    background: #b91c1c;
+    color: #ffffff;
 }
 
 .transaction-table-wrap {
@@ -461,3 +484,62 @@
 
 /* greyed-out button (e.g. Complete while a balance is still unpaid) */
 .transaction-action-card button:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ========================================
+   STAFF TRANSACTION DETAILS: two even columns
+   left  = payment history + actions (complete / void)
+   right = payment summary + record payment
+======================================== */
+.transaction-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 16px;
+    align-items: start;
+    margin: 14px 0;
+}
+
+.transaction-detail-main,
+.transaction-detail-side {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+}
+
+.transaction-detail-layout .transaction-form-card,
+.transaction-detail-layout .transaction-action-card { margin: 0; }
+
+.transaction-detail-layout .transaction-action-card { padding: 18px 20px; }
+
+/* the record-payment form now sits in its own card, so it needs no divider line */
+.transaction-detail-side .transaction-record-payment {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.transaction-detail-main .transaction-action-card form { margin-top: 14px; }
+
+/* void: reason box and button on one line */
+.transaction-void-row { display: flex; gap: 10px; align-items: stretch; }
+.transaction-void-row input {
+    flex: 1;
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 11px;
+    box-sizing: border-box;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    color: #111827;
+    font: inherit;
+    font-size: 13px;
+}
+.transaction-void-row .transaction-danger-button { white-space: nowrap; }
+
+@media (max-width: 1000px) {
+    .transaction-detail-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+    .transaction-void-row { flex-direction: column; }
+}

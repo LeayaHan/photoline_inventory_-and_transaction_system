@@ -43,7 +43,7 @@ class CustomerTransactionController extends Controller
 
     public function managerShow(CustomerTransaction $transaction)
     {
-        $transaction->load(['details', 'staff', 'payments.staff']);
+        $transaction->load(['details', 'staff', 'voidedBy', 'payments.staff']);
 
         return view('branch-manager.transactions.show', compact('transaction'));
     }
@@ -98,7 +98,7 @@ class CustomerTransactionController extends Controller
 
     public function show(CustomerTransaction $transaction)
     {
-        $transaction->load(['details', 'staff', 'payments.staff']);
+        $transaction->load(['details', 'staff', 'voidedBy', 'payments.staff']);
 
         return view('staff.transactions.show', compact('transaction'));
     }
@@ -276,22 +276,84 @@ class CustomerTransactionController extends Controller
         return redirect()->route('staff.transactions.show', $transaction)->with('success', $message);
     }
 
+    /**
+     * Void a transaction. A Pending or a Completed transaction can be voided, with a reason.
+     * If it was already Completed, the stock that was deducted is put back into inventory.
+     */
     public function void(Request $request, CustomerTransaction $transaction)
     {
-        $this->ensurePending($transaction);
+        $this->ensureVoidable($transaction);
 
         $data = $request->validate([
             'void_reason' => ['required', 'string', 'max:255'],
         ]);
 
-        $transaction->update([
-            'status' => 'Voided',
-            'void_reason' => trim($data['void_reason']),
-        ]);
+        $stockReturned = false;
+
+        DB::transaction(function () use ($transaction, $data, &$stockReturned) {
+            // lock the row so a double click can't void (and return the stock) twice
+            $transaction = CustomerTransaction::whereKey($transaction->id)
+                ->lockForUpdate()
+                ->with('details')
+                ->firstOrFail();
+
+            $this->ensureVoidable($transaction);
+
+            // stock was only deducted when the transaction was completed
+            if ($transaction->status === 'Completed') {
+                $this->returnStockToInventory($transaction);
+                $stockReturned = true;
+            }
+
+            $transaction->update([
+                'status' => 'Voided',
+                'void_reason' => trim($data['void_reason']),
+                'voided_by_staff_id' => auth('staff')->id(),
+                'voided_at' => now(),
+            ]);
+        });
+
+        $message = $stockReturned
+            ? 'Transaction has been voided and its stock was returned to inventory.'
+            : 'Transaction has been voided.';
 
         return redirect()
             ->route('staff.transactions.show', $transaction)
-            ->with('success', 'Transaction has been voided.');
+            ->with('success', $message);
+    }
+
+    /**
+     * Undo what complete() did to the inventory.
+     * Merchandise: add back the quantity sold on each product line.
+     * Raw materials: add back what was recorded in transaction_material_usages.
+     */
+    private function returnStockToInventory(CustomerTransaction $transaction): void
+    {
+        $productRows = [];
+        foreach ($transaction->details as $detail) {
+            if (($detail->line_type ?? 'service') === 'product' || $detail->inventory_item_id) {
+                $productRows[$detail->inventory_item_id] = ($productRows[$detail->inventory_item_id] ?? 0) + (int) $detail->quantity;
+            }
+        }
+
+        foreach ($productRows as $itemId => $sold) {
+            // the product may have been deleted from inventory since, then there is nothing to add back
+            $product = InventoryItem::whereKey($itemId)->lockForUpdate()->first();
+            if ($product) {
+                $product->increment('quantity', $sold);
+            }
+        }
+
+        $usages = DB::table('transaction_material_usages')
+            ->where('customer_transaction_id', $transaction->id)
+            ->get();
+
+        foreach ($usages as $usage) {
+            $item = InventoryItem::whereKey($usage->inventory_item_id)->lockForUpdate()->first();
+            if ($item) {
+                $item->increment('quantity', (int) $usage->quantity_used);
+            }
+        }
     }
 
     // $existing is only passed when editing a transaction
@@ -380,6 +442,11 @@ class CustomerTransactionController extends Controller
         }
         $finalTotal = round($subtotal - $discount, 2);
 
+        // a transaction with nothing to pay (₱0.00 total) is not allowed, whether new or edited
+        if ($finalTotal <= 0) {
+            throw ValidationException::withMessages(['details' => 'The total due must be more than ₱0.00. Check the prices, quantities and discount.']);
+        }
+
         if ($existing) {
             // editing: the new total can't go below what the customer already paid
             if ($finalTotal < $existing->amount_paid) {
@@ -418,6 +485,13 @@ class CustomerTransactionController extends Controller
                 fn ($query) => $query->where('status', $request->status))
             ->when($request->filled('date_from'), fn ($query) => $query->whereDate('transaction_date', '>=', $request->date_from))
             ->when($request->filled('date_to'), fn ($query) => $query->whereDate('transaction_date', '<=', $request->date_to));
+    }
+
+    private function ensureVoidable(CustomerTransaction $transaction): void
+    {
+        if (! $transaction->isVoidable()) {
+            abort(403, 'This transaction is already voided.');
+        }
     }
 
     private function ensurePending(CustomerTransaction $transaction): void

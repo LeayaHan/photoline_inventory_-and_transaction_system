@@ -14,6 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="{{ asset('css/photoline-layout.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/photoline-confirm.css') }}">
 </head>
 <body>
     <div class="photoline-layout">
@@ -38,6 +39,12 @@
                     <span>Users</span>
                 </a>
 
+                <a href="{{ route('branch-manager.transactions.index') }}"
+                   class="photoline-nav-link {{ request()->routeIs('branch-manager.transactions.*') ? 'active' : '' }}">
+                    <span class="photoline-nav-icon">⇄</span>
+                    <span>Transactions</span>
+                </a>
+
                 @php($lowStockTotal = array_sum(\App\Models\InventoryItem::lowStockCounts()))
                 <a href="{{ route('branch-manager.inventory.index') }}"
                    class="photoline-nav-link {{ request()->routeIs('branch-manager.inventory.*') ? 'active' : '' }}"
@@ -59,10 +66,10 @@
                     @endif
                 </a>
 
-                <a href="{{ route('branch-manager.transactions.index') }}"
-                   class="photoline-nav-link {{ request()->routeIs('branch-manager.transactions.*') ? 'active' : '' }}">
-                    <span class="photoline-nav-icon">⇄</span>
-                    <span>Transactions</span>
+                <a href="{{ route('branch-manager.audits.index') }}"
+                   class="photoline-nav-link {{ request()->routeIs('branch-manager.audits.*') ? 'active' : '' }}">
+                    <span class="photoline-nav-icon">☷</span>
+                    <span>Audit Records</span>
                 </a>
 
                 <a href="{{ route('branch-manager.reports.index') }}"
@@ -71,11 +78,6 @@
                     <span>Reports</span>
                 </a>
 
-                <a href="{{ route('branch-manager.audits.index') }}"
-                   class="photoline-nav-link {{ request()->routeIs('branch-manager.audits.*') ? 'active' : '' }}">
-                    <span class="photoline-nav-icon">☷</span>
-                    <span>Audit Records</span>
-                </a>
             </nav>
 
             <div class="photoline-sidebar-bottom">
@@ -90,7 +92,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" data-confirm="Are you sure you want to log out?" data-confirm-title="Log out" data-confirm-ok="Log out">
                     @csrf
 
                     <button type="submit" class="photoline-logout">
@@ -144,5 +146,6 @@
             menuToggle.setAttribute('aria-expanded', String(isOpen));
         });
     </script>
+    <script src="{{ asset('js/photoline-confirm.js') }}"></script>
 </body>
 </html>

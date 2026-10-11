@@ -4,7 +4,6 @@
     <div class="staffui-pagehead audit-pagehead">
         <div>
             <h1>Inventory Audits</h1>
-            <p>Review your audits, continue unfinished counts, and view finalized reports.</p>
         </div>
         <a class="staffui-btn" href="{{ route('staff.audits.create') }}">Create Audit</a>
     </div>

@@ -11,6 +11,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('css/staff-layout.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/photoline-confirm.css') }}">
 </head>
 <body class="staffui-body">
     @php($staffUser = auth('staff')->user())
@@ -59,7 +60,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" data-confirm="Are you sure you want to log out?" data-confirm-title="Log out" data-confirm-ok="Log out">
                     @csrf
                     <button type="submit" class="staffui-logout">
                         <span class="staffui-icon">↪</span>
@@ -106,5 +107,6 @@
             });
         })();
     </script>
+    <script src="{{ asset('js/photoline-confirm.js') }}"></script>
 </body>
 </html>

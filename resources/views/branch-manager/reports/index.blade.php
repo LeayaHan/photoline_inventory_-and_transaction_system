@@ -35,7 +35,6 @@
         <div class="users-header report-screen-only">
             <div>
                 <h1 class="users-title">Reports</h1>
-                <p class="users-subtitle">{{ $basis }}</p>
             </div>
             <div class="report-actions">
                 <a class="users-btn users-btn-secondary" href="{{ route('branch-manager.reports.export', ['type' => $type] + $carry) }}">Export CSV</a>
@@ -126,14 +125,13 @@
                             <tr>
                                 <td colspan="3">Total</td>
                                 <td class="num">{{ $num($report['total']->counted) }}</td>
-                                <td class="num">{{ $num($report['total']->matched) }}@if ($report['total']->accuracy !== null) <span class="report-sub">({{ $report['total']->accuracy }}%)</span>@endif</td>
+                                <td class="num">{{ $num($report['total']->matched) }}</td>
                                 <td class="num">{{ $num($report['total']->short) }}</td>
                                 <td class="num">{{ $num($report['total']->over) }}</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-                <p class="report-note">Each number counts products, not pieces. "Less than recorded" means staff found fewer on the shelf than the system says (missing stock). "More than recorded" means they found more.</p>
 
                 @if ($report['repeat']->isEmpty())
                     <p class="report-empty">Every counted item matched what was recorded.</p>
@@ -193,7 +191,6 @@
                         </tbody>
                     </table>
                 </div>
-                <p class="report-note">Billed is after discounts.</p>
 
                 <div class="report-pair">
                     <div>
@@ -342,7 +339,6 @@
                     </tfoot>
                 </table>
             </div>
-            <p class="report-note">Low stock = at or below the reorder level. Expired and expiring only count items that still have stock.</p>
 
             <h3 class="report-caption">Low-stock and expiry alerts</h3>
             @if ($report['rows']->isEmpty())
@@ -378,7 +374,6 @@
                         </tbody>
                     </table>
                 </div>
-                <p class="report-note">{{ $num($report['rows']->count()) }} item(s) listed, most urgent first.</p>
             @endif
         @endif
 

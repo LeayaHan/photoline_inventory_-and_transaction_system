@@ -104,11 +104,28 @@
     min-width: 140px;
 }
 
+/* Clear button: red, same shade as the staff Audit Records page */
 .audit-clear {
-    padding: 9px 4px;
-    color: #4b5563;
-    text-decoration: underline;
-    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid #dc2626;
+    border-radius: 7px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.audit-clear:hover {
+    border-color: #b91c1c;
+    background: #b91c1c;
+    color: #ffffff;
 }
 
 .audit-clear.staffui-btn {

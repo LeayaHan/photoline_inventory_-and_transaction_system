@@ -23,6 +23,8 @@ class CustomerTransaction extends Model
         'deposit_amount',
         'status',
         'void_reason',
+        'voided_by_staff_id',
+        'voided_at',
         'claimed_at',
     ];
 
@@ -33,12 +35,19 @@ class CustomerTransaction extends Model
             'discount_value' => 'decimal:2',
             'deposit_amount' => 'decimal:2',
             'claimed_at' => 'datetime',
+            'voided_at' => 'datetime',
         ];
     }
 
     public function staff(): BelongsTo
     {
         return $this->belongsTo(Staff::class);
+    }
+
+    // the staff member who voided this transaction
+    public function voidedBy(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'voided_by_staff_id');
     }
 
     public function details(): HasMany
@@ -111,5 +120,11 @@ class CustomerTransaction extends Model
     public function isEditable(): bool
     {
         return $this->status === 'Pending';
+    }
+
+    // Pending and Completed transactions can be voided. A voided one is final.
+    public function isVoidable(): bool
+    {
+        return in_array($this->status, ['Pending', 'Completed'], true);
     }
 }

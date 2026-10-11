@@ -11,7 +11,7 @@
                     &nbsp;<span class="transaction-status transaction-status-{{ strtolower($transaction->status) }}">{{ $transaction->status }}</span>
                 </p>
             </div>
-            <a class="users-btn users-btn-secondary" href="{{ route('branch-manager.transactions.index') }}">Back to Transactions</a>
+            <a class="users-btn users-btn-primary" href="{{ route('branch-manager.transactions.index') }}">Back to Transactions</a>
         </div>
 
         <section class="transaction-form-card">
@@ -25,6 +25,10 @@
                 <div><span>Recorded By</span><strong>{{ $transaction->staff?->full_name ?? 'Former staff' }}</strong></div>
                 @if ($transaction->void_reason)
                     <div class="transaction-info-wide"><span>Void Reason</span><strong>{{ $transaction->void_reason }}</strong></div>
+                @endif
+                @if ($transaction->voided_at)
+                    <div><span>Voided By</span><strong>{{ $transaction->voidedBy?->full_name ?? 'Former staff' }}</strong></div>
+                    <div><span>Voided On</span><strong>{{ $transaction->voided_at->format('M d, Y h:i A') }}</strong></div>
                 @endif
             </div>
         </section>

@@ -4,7 +4,6 @@
     <div class="staffui-pagehead transaction-pagehead">
         <div>
             <h1>Customer Transactions</h1>
-            <p>Create, search, and manage customer service records.</p>
         </div>
         <a class="staffui-btn" href="{{ route('staff.transactions.create') }}">New Transaction</a>
     </div>

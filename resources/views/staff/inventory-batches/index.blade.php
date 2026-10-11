@@ -3,7 +3,6 @@
     <div class="staffui-pagehead">
         <div>
             <h1>Stock Batches & Expiry</h1>
-            <p>Track individual deliveries and expiry dates without creating a second inventory system.</p>
         </div>
     </div>
 
@@ -23,7 +22,6 @@
     <div class="batch-columns">
         <section class="batch-card">
             <h2>Add Stock Batch</h2>
-            <p>Use this when a new delivery of an existing inventory item arrives.</p>
             <form method="POST" action="{{ route('staff.inventory-batches.store') }}" class="batch-form">
                 @csrf
                 <label>Inventory Item<select name="inventory_item_id" required><option value="">Choose item</option>@foreach ($items as $item)<option value="{{ $item->id }}">{{ $item->item_code }} · {{ $item->name }} ({{ $item->item_type === 'raw_material' ? 'Raw material' : 'Merchandise' }})</option>@endforeach</select></label>
@@ -40,7 +38,6 @@
 
         <section class="batch-card">
             <h2>Configure Material Usage</h2>
-            <p>Set how much of a raw material one service normally consumes. Use measured or manufacturer-supported values, not guesses.</p>
             <form method="POST" action="{{ route('staff.inventory-batches.rules.store') }}" class="batch-form">
                 @csrf
                 <label>Service Name<input name="service_name" maxlength="100" required placeholder="e.g. 4R Photo Print"></label>
@@ -54,7 +51,7 @@
                 @forelse ($rules as $rule)
                     <div class="batch-rule">
                         <div><strong>{{ $rule->service_name }}</strong><span>{{ $rule->item->name }} · {{ rtrim(rtrim(number_format((float) $rule->quantity_per_service, 4), '0'), '.') }} {{ $rule->usage_unit ?: $rule->item->unit }} per service</span></div>
-                        <form method="POST" action="{{ route('staff.inventory-batches.rules.destroy', $rule) }}" onsubmit="return confirm('Remove this material usage rule?')">@csrf @method('DELETE')<button type="submit" class="batch-remove">Remove</button></form>
+                        <form method="POST" action="{{ route('staff.inventory-batches.rules.destroy', $rule) }}" data-confirm="Remove this material usage rule?" data-confirm-title="Remove rule" data-confirm-ok="Remove">@csrf @method('DELETE')<button type="submit" class="batch-remove">Remove</button></form>
                     </div>
                 @empty
                     <p class="batch-muted">No material usage rules configured yet.</p>
@@ -64,7 +61,7 @@
     </div>
 
     <section class="batch-card batch-list-card">
-        <div class="batch-list-head"><div><h2>Stock Batch History</h2><p>Expired stock is flagged and should not be used.</p></div>
+        <div class="batch-list-head"><div><h2>Stock Batch History</h2></div>
             <form method="GET" class="batch-search"><input name="search" value="{{ request('search') }}" placeholder="Search item or batch"><select name="status"><option value="">All batches</option><option value="expired" @selected(request('status') === 'expired')>Expired</option><option value="near" @selected(request('status') === 'near')>Expiring within 30 days</option></select><button class="staffui-btn" type="submit">Filter</button></form>
         </div>
         <div class="batch-table-wrap"><table class="batch-table"><thead><tr><th>Item</th><th>Batch</th><th>Remaining Qty</th><th>Received</th><th>Expiry</th><th>Status</th></tr></thead><tbody>

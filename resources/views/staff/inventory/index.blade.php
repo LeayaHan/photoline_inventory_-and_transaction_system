@@ -2,7 +2,6 @@
     <div class="staffui-pagehead">
         <div>
             <h1>Inventory</h1>
-            <p>View current stock. Any change you make is sent to the branch manager for approval.</p>
         </div>
 
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -15,7 +14,7 @@
         <div class="staffui-alert staffui-alert-success">{{ session('success') }}</div>
     @endif
 
-    <x-inventory-switch :current="$itemType" :low-counts="$lowCounts" route-name="staff.inventory" />
+    <x-inventory-switch :current="$itemType" :low-counts="$lowCounts" route-name="staff.inventory" :hint="false" />
 
     <form method="GET" class="staffui-filters">
         {{-- keep the same side of the switch when searching/filtering --}}

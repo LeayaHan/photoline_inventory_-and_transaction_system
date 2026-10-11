@@ -51,7 +51,7 @@
                             <td>{{ str_replace('|', ' / ', $rule->service_name) }}</td>
                             <td>{{ $rule->item?->name ?? 'Missing inventory item' }}</td>
                             <td>{{ rtrim(rtrim(number_format((float) $rule->quantity_per_service, 4), '0'), '.') }} {{ $rule->usage_unit ?: $rule->item?->unit }}</td>
-                            <td><form method="POST" action="{{ route('branch-manager.service-material-rules.destroy', $rule) }}" onsubmit="return confirm('Remove this material rule?')">@csrf @method('DELETE')<button class="users-btn users-btn-secondary" type="submit">Remove</button></form></td>
+                            <td><form method="POST" action="{{ route('branch-manager.service-material-rules.destroy', $rule) }}" data-confirm="Remove this material rule?" data-confirm-title="Remove rule" data-confirm-ok="Remove">@csrf @method('DELETE')<button class="users-btn users-btn-secondary" type="submit">Remove</button></form></td>
                         </tr>
                     @empty
                         <tr><td colspan="4">No material rules configured yet.</td></tr>

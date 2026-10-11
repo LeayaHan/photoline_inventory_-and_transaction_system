@@ -6,7 +6,6 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Inventory Requests</h1>
-                <p class="users-subtitle">Review changes your staff want to make to the inventory.</p>
             </div>
         </div>
 

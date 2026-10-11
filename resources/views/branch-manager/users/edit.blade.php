@@ -6,7 +6,6 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Edit Staff</h1>
-                <p class="users-subtitle">Update staff account information.</p>
             </div>
 
             <a href="{{ route('branch-manager.users.index') }}"

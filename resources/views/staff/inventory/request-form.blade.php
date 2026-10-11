@@ -2,10 +2,7 @@
     <div class="staffui-pagehead">
         <div>
             <h1>{{ \App\Models\InventoryRequest::TYPES[$type] }}</h1>
-            <p>
-                {{ \App\Models\InventoryItem::TYPES[$itemType] }} &middot;
-                This is sent to the branch manager. Nothing changes until it is approved.
-            </p>
+            <p>{{ \App\Models\InventoryItem::TYPES[$itemType] }}</p>
         </div>
 
     </div>
@@ -23,7 +20,7 @@
 
         {{-- new items: pick Merchandise or Raw Materials first (this reloads the form with the right categories) --}}
         @if ($type === 'add')
-            <x-inventory-switch :current="$itemType" route-name="staff.inventory.requests.create" :params="['type' => 'add']" />
+            <x-inventory-switch :current="$itemType" route-name="staff.inventory.requests.create" :params="['type' => 'add']" :hint="false" />
         @endif
 
         @if ($item)
@@ -53,7 +50,19 @@
 
                 <div class="staffui-field">
                     <label for="unit">Unit </label>
-                    <input id="unit" type="text" name="unit" value="{{ old('unit', $item?->unit ?? 'pcs') }}" required>
+                    @php
+                        $currentUnit = old('unit', $item?->unit ?? 'pcs');
+                        $unitOptions = \App\Models\InventoryItem::UNITS;
+                        // an older item with its own spelling keeps working until someone changes it
+                        if (! in_array($currentUnit, $unitOptions, true)) {
+                            $unitOptions[] = $currentUnit;
+                        }
+                    @endphp
+                    <select id="unit" name="unit" required>
+                        @foreach ($unitOptions as $unit)
+                            <option value="{{ $unit }}" {{ $currentUnit === $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="staffui-field">
@@ -89,7 +98,6 @@
                 <div class="staffui-field">
                     <label for="expiry_date">Expiry Date <span>(optional)</span></label>
                     <input id="expiry_date" type="date" name="expiry_date" value="{{ old('expiry_date', $item?->expiry_date?->format('Y-m-d')) }}">
-                    <small>Leave blank if the manufacturer does not provide an expiry date.</small>
                 </div>
 
                 <div class="staffui-field is-wide">

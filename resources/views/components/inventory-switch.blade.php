@@ -9,7 +9,7 @@
     On the "add item" form (no badges, but keeps type=add in the link):
     <x-inventory-switch :current="$itemType" route-name="staff.inventory.requests.create" :params="['type' => 'add']" />
 --}}
-@props(['current', 'routeName', 'lowCounts' => [], 'params' => []])
+@props(['current', 'routeName', 'lowCounts' => [], 'params' => [], 'hint' => true])
 
 <link rel="stylesheet" href="{{ asset('css/inventory-switch.css') }}">
 
@@ -27,4 +27,6 @@
     @endforeach
 </div>
 
-<p class="inv-switch-hint">{{ \App\Models\InventoryItem::DESCRIPTIONS[$current] }}</p>
+@if ($hint)
+    <p class="inv-switch-hint">{{ \App\Models\InventoryItem::DESCRIPTIONS[$current] }}</p>
+@endif

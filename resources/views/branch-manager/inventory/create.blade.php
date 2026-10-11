@@ -6,7 +6,6 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Add Inventory Item</h1>
-                <p class="users-subtitle">Add a new item to your branch inventory.</p>
             </div>
 
             <a href="{{ route('branch-manager.inventory.index') }}" class="users-btn users-btn-secondary">Back to Inventory</a>

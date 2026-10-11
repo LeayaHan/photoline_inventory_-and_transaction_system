@@ -6,12 +6,11 @@
         <div class="users-header">
             <div>
                 <h1 class="users-title">Inventory</h1>
-                <p class="users-subtitle">
-                    View your branch stock. Staff change it through requests that you approve.
-                    @if ($lowCounts[$itemType])
+                @if ($lowCounts[$itemType])
+                    <p class="users-subtitle">
                         <strong style="color:#b45309;">{{ $lowCounts[$itemType] }} item(s) need restocking.</strong>
-                    @endif
-                </p>
+                    </p>
+                @endif
             </div>
         </div>
 
@@ -19,7 +18,7 @@
             <div class="users-alert users-alert-success">{{ session('success') }}</div>
         @endif
 
-        <x-inventory-switch :current="$itemType" :low-counts="$lowCounts" route-name="branch-manager.inventory.index" />
+        <x-inventory-switch :current="$itemType" :low-counts="$lowCounts" route-name="branch-manager.inventory.index" :hint="false" />
 
         <form method="GET" class="inv-toolbar">
             {{-- keep the same side of the switch when searching/filtering --}}
