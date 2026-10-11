@@ -83,6 +83,10 @@
                             <option value="" disabled {{ old('position') ? '' : 'selected' }}>
                                 Select position
                             </option>
+                            <option value="Cashier"
+                                    {{ old('position') === 'Cashier' ? 'selected' : '' }}>
+                                    Cashier
+                            </option>
                             <option value="Photographer"
                                 {{ old('position') === 'Photographer' ? 'selected' : '' }}>
                                 Photographer
