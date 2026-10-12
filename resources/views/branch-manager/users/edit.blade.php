@@ -8,10 +8,6 @@
                 <h1 class="users-title">Edit Staff</h1>
             </div>
 
-            <a href="{{ route('branch-manager.users.index') }}"
-               class="users-btn users-btn-secondary">
-                Back to Staff
-            </a>
         </div>
 
         @if ($errors->any())
