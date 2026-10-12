@@ -13,45 +13,37 @@ class InventoryAuditController extends Controller
 {
     public function managerIndex(Request $request)
     {
-        // The manager sees EVERY audit here: drafts (still being counted) and finalized ones.
-        // The Status filter is only there to narrow the list down when wanted.
-        $audits = InventoryAudit::query()
+        // The manager only sees FINISHED audits. Drafts are still being counted by staff,
+        // so they are neither listed nor included in any of the numbers below.
+        $finalized = fn () => InventoryAudit::query()
+            ->where('status', 'finalized')
+            ->when($request->filled('auditor'), fn ($query) => $query->where('auditor_name', 'like', '%' . $request->auditor . '%'))
+            ->when($request->filled('product'), fn ($query) => $query->whereHas('items', fn ($items) => $items
+                ->where(fn ($match) => $match
+                    ->where('item_name', 'like', '%' . $request->product . '%')
+                    ->orWhere('item_code', 'like', '%' . $request->product . '%'))))
+            ->when($request->filled('date_from'), fn ($query) => $query->whereDate('audit_date', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn ($query) => $query->whereDate('audit_date', '<=', $request->date_to));
+
+        $audits = $finalized()
             ->withCount([
                 'items',
                 'items as counted_items_count' => fn ($query) => $query->whereNotNull('physical_quantity'),
             ])
-            ->when($request->filled('status') && in_array($request->status, ['draft', 'finalized'], true),
-                fn ($query) => $query->where('status', $request->status))
-            ->when($request->filled('auditor'), fn ($query) => $query->where('auditor_name', 'like', '%' . $request->auditor . '%'))
-            ->when($request->filled('product'), fn ($query) => $query->whereHas('items', fn ($items) => $items
-                ->where('item_name', 'like', '%' . $request->product . '%')
-                ->orWhere('item_code', 'like', '%' . $request->product . '%')))
-            ->when($request->filled('date_from'), fn ($query) => $query->whereDate('audit_date', '>=', $request->date_from))
-            ->when($request->filled('date_to'), fn ($query) => $query->whereDate('audit_date', '<=', $request->date_to))
             ->latest('audit_date')
             ->latest('id')
             ->paginate(10)
             ->withQueryString();
 
-        $finalizedItems = InventoryAuditItem::whereHas('audit', fn ($query) => $query->where('status', 'finalized'))
-            ->whereNotNull('physical_quantity');
-
-        $summary = [
-            'audits' => InventoryAudit::count(),
-            'items_checked' => (clone $finalizedItems)->count(),
-            'shortages' => (clone $finalizedItems)->whereColumn('physical_quantity', '<', 'recorded_quantity')->count(),
-            'excesses' => (clone $finalizedItems)->whereColumn('physical_quantity', '>', 'recorded_quantity')->count(),
-            'matched' => (clone $finalizedItems)->whereColumn('physical_quantity', '=', 'recorded_quantity')->count(),
-            'draft' => InventoryAudit::where('status', 'draft')->count(),
-            'finalized' => InventoryAudit::where('status', 'finalized')->count(),
-        ];
-
-        return view('branch-manager.audits.index', compact('audits', 'summary'));
+        return view('branch-manager.audits.index', compact('audits'));
     }
 
     public function managerShow(InventoryAudit $audit)
     {
-        $audit->load('items');
+        // Drafts are not part of the manager's records yet.
+        abort_unless($audit->isFinalized(), 404);
+
+        $audit->load(['items' => fn ($query) => $query->orderBy('item_name')]);
 
         return view('branch-manager.audits.show', compact('audit'));
     }
@@ -254,6 +246,24 @@ class InventoryAuditController extends Controller
             if ($lockedAudit->items()->whereNull('physical_quantity')->exists()) {
                 throw ValidationException::withMessages([
                     'items' => 'Enter a physical count for every listed item before finalizing this audit.',
+                ]);
+            }
+
+            // Stock can move (sales, deliveries, material use) between the moment an item was
+            // counted and the moment the audit is finalized. Compare every physical count against
+            // the system stock as it is RIGHT NOW, so the saved shortage/excess is accurate.
+            foreach ($lockedAudit->items()->get() as $item) {
+                $currentStock = $item->inventory_item_id
+                    ? InventoryItem::whereKey($item->inventory_item_id)->lockForUpdate()->value('quantity')
+                    : null;
+
+                $recorded = $currentStock !== null ? (int) $currentStock : (int) $item->recorded_quantity;
+                $difference = (int) $item->physical_quantity - $recorded;
+
+                $item->update([
+                    'recorded_quantity' => $recorded,
+                    'discrepancy' => $difference,
+                    'status' => $difference < 0 ? 'Shortage' : ($difference > 0 ? 'Excess' : 'Matched'),
                 ]);
             }
 

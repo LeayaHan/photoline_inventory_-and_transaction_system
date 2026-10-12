@@ -48,7 +48,7 @@ class DashboardController extends Controller
             ->latest()
             ->take(self::RECENT)->get();
 
-        $recentAudits = InventoryAudit::latest('audit_date')->latest('id')
+        $recentAudits = InventoryAudit::where('status', 'finalized')->latest('audit_date')->latest('id')
             ->take(self::RECENT)->get();
 
         return view('branch-manager.dashboard', [

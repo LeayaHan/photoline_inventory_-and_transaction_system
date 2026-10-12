@@ -9,33 +9,6 @@
             </div>
         </div>
 
-        <div class="audit-summary-grid">
-            <div class="audit-summary">
-                <span>Audits</span>
-                <strong>{{ $summary['audits'] }}</strong>
-            </div>
-
-            <div class="audit-summary">
-                <span>Items Counted</span>
-                <strong>{{ $summary['items_checked'] }}</strong>
-            </div>
-
-            <div class="audit-summary">
-                <span>Shortages</span>
-                <strong>{{ $summary['shortages'] }}</strong>
-            </div>
-
-            <div class="audit-summary">
-                <span>Excesses</span>
-                <strong>{{ $summary['excesses'] }}</strong>
-            </div>
-
-            <div class="audit-summary">
-                <span>Matched</span>
-                <strong>{{ $summary['matched'] }}</strong>
-            </div>
-        </div>
-
         <form method="GET" class="audit-filters audit-manager-filters">
             <label>
                 From
@@ -53,15 +26,6 @@
                     name="date_to"
                     value="{{ request('date_to') }}"
                 >
-            </label>
-
-            <label>
-                Status
-                <select name="status">
-                    <option value="">All (drafts and finalized)</option>
-                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft (ongoing)</option>
-                    <option value="finalized" {{ request('status') === 'finalized' ? 'selected' : '' }}>Finalized</option>
-                </select>
             </label>
 
             <label>
@@ -124,7 +88,7 @@
                             </td>
 
                             <td>
-                                {{ $audit->isFinalized() ? 'Finalized' : 'Draft (ongoing)' }}
+                                Finalized
                             </td>
 
                             <td>
@@ -149,7 +113,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="users-empty">
-                                No audit records found.
+                                No finalized audits found.
                             </td>
                         </tr>
                     @endforelse

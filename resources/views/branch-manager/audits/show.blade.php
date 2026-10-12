@@ -15,7 +15,7 @@
 
         @if ($audit->isFinalized())
             <div class="users-alert users-alert-success">
-                Finalized on {{ $audit->finalized_at?->format('M d, Y g:i A') }}. This record is read-only.
+                Finalized on {{ ($audit->finalized_at ?? $audit->updated_at)?->format('M d, Y g:i A') }}. This record is read-only.
             </div>
         @else
             <div class="users-alert">This audit is still a draft. The auditor may continue counting items.</div>
