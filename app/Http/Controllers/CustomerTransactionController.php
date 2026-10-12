@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerTransaction;
+use App\Models\InventoryBatch;
 use App\Models\InventoryItem;
 use App\Models\ServiceMaterialRule;
 use App\Models\TransactionPayment;
@@ -239,6 +240,7 @@ class CustomerTransactionController extends Controller
             foreach ($productRows as $itemId => $sold) {
                 $product = InventoryItem::whereKey($itemId)->lockForUpdate()->firstOrFail();
                 $product->decrement('quantity', $sold);
+                $this->deductFromBatches((int) $itemId, (int) $sold);
             }
 
             foreach ($usageRows as $itemId => $used) {
@@ -254,6 +256,7 @@ class CustomerTransactionController extends Controller
             foreach ($usageRows as $itemId => $used) {
                 $item = InventoryItem::whereKey($itemId)->lockForUpdate()->firstOrFail();
                 $item->decrement('quantity', $used);
+                $this->deductFromBatches((int) $itemId, (int) $used);
                 DB::table('transaction_material_usages')->insert([
                     'customer_transaction_id' => $transaction->id,
                     'inventory_item_id' => $itemId,
@@ -277,8 +280,9 @@ class CustomerTransactionController extends Controller
     }
 
     /**
-     * Void a transaction. A Pending or a Completed transaction can be voided, with a reason.
-     * If it was already Completed, the stock that was deducted is put back into inventory.
+     * Void a transaction. Only a Pending transaction can be voided, with a reason.
+     * Stock is only deducted when a transaction is Completed, so a pending one has nothing to return.
+     * A Completed or already Voided transaction can not be voided.
      */
     public function void(Request $request, CustomerTransaction $transaction)
     {
@@ -288,22 +292,13 @@ class CustomerTransactionController extends Controller
             'void_reason' => ['required', 'string', 'max:255'],
         ]);
 
-        $stockReturned = false;
-
-        DB::transaction(function () use ($transaction, $data, &$stockReturned) {
-            // lock the row so a double click can't void (and return the stock) twice
+        DB::transaction(function () use ($transaction, $data) {
+            // lock the row so a double click (or a Complete click at the same time) can't get past the check
             $transaction = CustomerTransaction::whereKey($transaction->id)
                 ->lockForUpdate()
-                ->with('details')
                 ->firstOrFail();
 
             $this->ensureVoidable($transaction);
-
-            // stock was only deducted when the transaction was completed
-            if ($transaction->status === 'Completed') {
-                $this->returnStockToInventory($transaction);
-                $stockReturned = true;
-            }
 
             $transaction->update([
                 'status' => 'Voided',
@@ -313,46 +308,34 @@ class CustomerTransactionController extends Controller
             ]);
         });
 
-        $message = $stockReturned
-            ? 'Transaction has been voided and its stock was returned to inventory.'
-            : 'Transaction has been voided.';
-
         return redirect()
             ->route('staff.transactions.show', $transaction)
-            ->with('success', $message);
+            ->with('success', 'Transaction has been voided.');
     }
 
     /**
-     * Undo what complete() did to the inventory.
-     * Merchandise: add back the quantity sold on each product line.
-     * Raw materials: add back what was recorded in transaction_material_usages.
+     * Keep the stock batches in step with the item quantity: take the used amount out of the
+     * batches, the ones that expire first (then the oldest), so the Inventory Batches page matches.
+     * Items without batches are skipped, their quantity was already lowered.
      */
-    private function returnStockToInventory(CustomerTransaction $transaction): void
+    private function deductFromBatches(int $itemId, int $amount): void
     {
-        $productRows = [];
-        foreach ($transaction->details as $detail) {
-            if (($detail->line_type ?? 'service') === 'product' || $detail->inventory_item_id) {
-                $productRows[$detail->inventory_item_id] = ($productRows[$detail->inventory_item_id] ?? 0) + (int) $detail->quantity;
-            }
-        }
-
-        foreach ($productRows as $itemId => $sold) {
-            // the product may have been deleted from inventory since, then there is nothing to add back
-            $product = InventoryItem::whereKey($itemId)->lockForUpdate()->first();
-            if ($product) {
-                $product->increment('quantity', $sold);
-            }
-        }
-
-        $usages = DB::table('transaction_material_usages')
-            ->where('customer_transaction_id', $transaction->id)
+        $batches = InventoryBatch::where('inventory_item_id', $itemId)
+            ->where('quantity', '>', 0)
+            ->orderByRaw('expiry_date IS NULL')
+            ->orderBy('expiry_date')
+            ->orderBy('id')
+            ->lockForUpdate()
             ->get();
 
-        foreach ($usages as $usage) {
-            $item = InventoryItem::whereKey($usage->inventory_item_id)->lockForUpdate()->first();
-            if ($item) {
-                $item->increment('quantity', (int) $usage->quantity_used);
+        foreach ($batches as $batch) {
+            if ($amount <= 0) {
+                break;
             }
+
+            $take = min($amount, (int) $batch->quantity);
+            $batch->decrement('quantity', $take);
+            $amount -= $take;
         }
     }
 
@@ -490,7 +473,9 @@ class CustomerTransactionController extends Controller
     private function ensureVoidable(CustomerTransaction $transaction): void
     {
         if (! $transaction->isVoidable()) {
-            abort(403, 'This transaction is already voided.');
+            abort(403, $transaction->status === 'Completed'
+                ? 'A completed transaction can not be voided.'
+                : 'Only pending transactions can be voided.');
         }
     }
 

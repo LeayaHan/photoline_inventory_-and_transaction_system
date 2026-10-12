@@ -8,19 +8,30 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            // Current recorded (system / POS) stock for the item.
-            $table->unsignedInteger('quantity')->default(0)->after('unit');
+        if (! Schema::hasColumn('products', 'quantity')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->unsignedInteger('quantity')->default(0)->after('unit');
+            });
+        }
 
-            // When quantity falls to this level or below the item shows up in Replenishment.
-            $table->unsignedInteger('reorder_level')->default(5)->after('quantity');
-        });
+        if (! Schema::hasColumn('products', 'reorder_level')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->unsignedInteger('reorder_level')->default(5)->after('quantity');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['quantity', 'reorder_level']);
-        });
+        $columns = array_values(array_filter(
+            ['quantity', 'reorder_level'],
+            fn ($column) => Schema::hasColumn('products', $column)
+        ));
+
+        if ($columns !== []) {
+            Schema::table('products', function (Blueprint $table) use ($columns) {
+                $table->dropColumn($columns);
+            });
+        }
     }
 };

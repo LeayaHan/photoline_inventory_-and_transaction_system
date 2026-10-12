@@ -7,6 +7,7 @@ use App\Models\InventoryItem;
 use App\Models\ServiceMaterialRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class InventoryBatchController extends Controller
@@ -31,6 +32,7 @@ class InventoryBatchController extends Controller
 
         $items = InventoryItem::orderBy('name')->get();
         $rules = ServiceMaterialRule::with('item')->orderBy('service_name')->get();
+        $serviceKeys = $this->serviceKeys();
 
         $summary = [
             'batches' => InventoryBatch::count(),
@@ -38,7 +40,7 @@ class InventoryBatchController extends Controller
             'near' => InventoryBatch::whereNotNull('expiry_date')->whereBetween('expiry_date', [now()->toDateString(), now()->addDays(30)->toDateString()])->where('quantity', '>', 0)->count(),
         ];
 
-        return view('staff.inventory-batches.index', compact('batches', 'items', 'rules', 'summary'));
+        return view('staff.inventory-batches.index', compact('batches', 'items', 'rules', 'summary', 'serviceKeys'));
     }
 
     public function storeBatch(Request $request)
@@ -57,19 +59,22 @@ class InventoryBatchController extends Controller
 
             InventoryBatch::create($data);
 
-            $item->quantity = InventoryBatch::where('inventory_item_id', $item->id)->sum('quantity');
-            $item->save();
+            // add the new batch on top of the current stock. (Before, the quantity was reset to the
+            // sum of the batches, which wiped out stock used by completed transactions.)
+            $item->increment('quantity', (int) $data['quantity']);
         });
 
-        return back()->with('success', 'Stock batch added and inventory quantity synchronized.');
+        return back()->with('success', 'Stock batch added to the inventory quantity.');
     }
 
     public function storeRule(Request $request)
     {
+        // the service has to be one of the real service + size options, because that exact key is
+        // what Complete looks up. A free-typed name could never match a transaction.
         $data = $request->validate([
-            'service_name' => ['required', 'string', 'max:100'],
+            'service_name' => ['required', 'string', Rule::in(array_keys($this->serviceKeys()))],
             'inventory_item_id' => ['required', 'integer', 'exists:inventory_items,id'],
-            'quantity_per_service' => ['required', 'numeric', 'gt:0', 'max:100000'],
+            'quantity_per_service' => ['required', 'integer', 'min:1', 'max:100000'],
             'usage_unit' => ['nullable', 'string', 'max:30'],
         ]);
 
@@ -86,6 +91,20 @@ class InventoryBatchController extends Controller
         );
 
         return back()->with('success', 'Material usage rule saved. The usage amount is a configurable estimate and should match your actual printer and service.');
+    }
+
+    /** Every service + size that can have a rule, like "ID Photos|2×2|" => "ID Photos / 2×2" (same keys as the manager screen). */
+    private function serviceKeys(): array
+    {
+        $keys = [];
+
+        foreach (config('photoline_services.catalog', []) as $serviceName => $service) {
+            foreach (($service['sizes'] ?? []) as $size => $unused) {
+                $keys[$serviceName . '|' . $size . '|'] = $serviceName . ' / ' . $size;
+            }
+        }
+
+        return $keys;
     }
 
     public function destroyRule(ServiceMaterialRule $rule)

@@ -122,9 +122,9 @@ class CustomerTransaction extends Model
         return $this->status === 'Pending';
     }
 
-    // Pending and Completed transactions can be voided. A voided one is final.
+    // Only a Pending transaction can be voided. Once it is Completed (stock already used) or Voided, it is final.
     public function isVoidable(): bool
     {
-        return in_array($this->status, ['Pending', 'Completed'], true);
+        return $this->status === 'Pending';
     }
 }

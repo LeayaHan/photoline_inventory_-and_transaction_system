@@ -92,12 +92,10 @@
                 </div>
             </section>
 
-            {{-- A pending transaction can be completed or voided. A completed one can still be voided. Voided ones are final. --}}
+            {{-- Only a pending transaction can be completed or voided. Completed and voided transactions are final. --}}
             @if ($transaction->isVoidable())
                 @php
-                    $voidWarning = $transaction->status === 'Completed'
-                        ? 'Void this completed transaction? The stock used for it will be put back into inventory. This action cannot be undone.'
-                        : 'Void this transaction? This action cannot be undone.';
+                    $voidWarning = 'Void this transaction? This action cannot be undone.';
                 @endphp
 
                 @if ($transaction->status === 'Pending')
@@ -121,15 +119,11 @@
                 <section class="transaction-action-card transaction-void-card">
                     <h2>Void Transaction</h2>
                     <p>
-                        @if ($transaction->status === 'Completed')
-                            The stock used for this transaction goes back to inventory.
-                        @endif
+                        Only a pending transaction can be voided. No stock was deducted yet, so nothing is returned.
                         @if ($transaction->amount_paid > 0)
                             Payments stay in the history, so refund the customer if needed.
                         @endif
-                        @if ($transaction->status !== 'Completed' && $transaction->amount_paid <= 0)
-                            A reason is required. This cannot be undone.
-                        @endif
+                        A reason is required. This cannot be undone.
                     </p>
 
                     <form method="POST" action="{{ route('staff.transactions.void', $transaction) }}" class="transaction-void-row" data-confirm="{{ $voidWarning }}" data-confirm-title="Void transaction" data-confirm-ok="Void">

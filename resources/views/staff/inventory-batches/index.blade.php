@@ -40,9 +40,9 @@
             <h2>Configure Material Usage</h2>
             <form method="POST" action="{{ route('staff.inventory-batches.rules.store') }}" class="batch-form">
                 @csrf
-                <label>Service Name<input name="service_name" maxlength="100" required placeholder="e.g. 4R Photo Print"></label>
+                <label>Service Option<select name="service_name" required><option value="">Choose service option</option>@foreach ($serviceKeys as $key => $label)<option value="{{ $key }}">{{ $label }}</option>@endforeach</select></label>
                 <label>Raw Material<select name="inventory_item_id" required><option value="">Choose raw material</option>@foreach ($items->where('item_type', 'raw_material') as $item)<option value="{{ $item->id }}">{{ $item->name }} ({{ $item->unit }})</option>@endforeach</select></label>
-                <label>Quantity Used Per Service<input type="number" name="quantity_per_service" min="0.0001" max="100000" step="0.0001" required placeholder="e.g. 1"></label>
+                <label>Quantity Used Per Service<input type="number" name="quantity_per_service" min="1" max="100000" step="1" value="1" required placeholder="e.g. 1"></label>
                 <label>Usage Unit <span>(optional)</span><input name="usage_unit" maxlength="30" placeholder="sheets, ml, grams"></label>
                 <button type="submit" class="staffui-btn">Save Usage Rule</button>
             </form>
@@ -50,7 +50,7 @@
                 <h3>Configured Rules</h3>
                 @forelse ($rules as $rule)
                     <div class="batch-rule">
-                        <div><strong>{{ $rule->service_name }}</strong><span>{{ $rule->item->name }} · {{ rtrim(rtrim(number_format((float) $rule->quantity_per_service, 4), '0'), '.') }} {{ $rule->usage_unit ?: $rule->item->unit }} per service</span></div>
+                        <div><strong>{{ str_replace('|', ' / ', rtrim($rule->service_name, '|')) }}</strong><span>{{ $rule->item->name }} · {{ rtrim(rtrim(number_format((float) $rule->quantity_per_service, 4), '0'), '.') }} {{ $rule->usage_unit ?: $rule->item->unit }} per service</span></div>
                         <form method="POST" action="{{ route('staff.inventory-batches.rules.destroy', $rule) }}" data-confirm="Remove this material usage rule?" data-confirm-title="Remove rule" data-confirm-ok="Remove">@csrf @method('DELETE')<button type="submit" class="batch-remove">Remove</button></form>
                     </div>
                 @empty
